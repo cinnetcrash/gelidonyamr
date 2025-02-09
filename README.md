@@ -3,7 +3,7 @@
 
 # **gelidonyAMR: Salmonella Infantis Nextflow Pipeline**
 
-### 🔬 About GelidonyAMR  
+### About GelidonyAMR  
 
 The name **GelidonyAMR** is inspired by the **Gelidonya Lighthouse**, a historic maritime landmark located on the southern coast of Türkiye, near Finike. Standing on a rugged cliff overlooking the vast Mediterranean, Gelidonya feels like the **edge of the world**—a place where time slows down, technology fades, and solitude takes over. It is one of the rare places where I can truly be alone, disconnected from everything yet deeply connected to nature.  
 
