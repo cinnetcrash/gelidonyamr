@@ -59,7 +59,7 @@ To execute the pipeline, use the following command:
 nextflow run main.nf --reads "../input_folder/*.fastq" --outdir Results -c config/nextflow.config
 ```
 
-## ⚠️ Environment Considerations
+## Environment Considerations
 - This pipeline **currently works only in a Conda environment**.
 - **Docker support is planned** for future releases.
 - A similar pipeline is planned for *Enterohemorrhagic Escherichia coli* (**EHEC**).
