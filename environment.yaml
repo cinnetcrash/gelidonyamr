@@ -13,3 +13,4 @@ dependencies:
   - kraken2=2.1.3
   - chewBBACA=2.8.5
   - fastp=0.24.0
+  - nextflow=21.04.1

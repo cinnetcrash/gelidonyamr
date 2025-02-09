@@ -4,7 +4,7 @@ process MULTIQC {
     publishDir params.outdir + "/multiqc/", mode: 'copy'
 
     input:
-    path fastqc_reports
+    path(fastqc_reports)
 
     output:
     path("multiqc_output/multiqc_report.html")
@@ -12,6 +12,6 @@ process MULTIQC {
     script:
     """
     mkdir -p multiqc_output
-    multiqc fastqc_output/ --outdir multiqc_output/ --ai-summary-full
+    multiqc ${fastqc_reports} --outdir multiqc_output/
     """
 }

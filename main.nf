@@ -28,10 +28,8 @@ workflow {
     amr_ready = assembled_contigs.map { sample_id, dir -> tuple(sample_id, file("${dir}/assembly.fasta")) }
     amr_results = AMR(amr_ready)
 
-
-    // Fix: Ensure all FastQC outputs are correctly collected for MultiQC
-    multiqc_ready = fastqc_out.collect().flatten()
-    multiqc_out = MULTIQC(multiqc_ready)
+    // Run MultiQC (after FASTQC)
+    multiqc_out = MULTIQC(fastqc_out.collect())  // Ensures all reports are collected first
 
     // Run annotation on assembled contigs
     annotated_genomes = ANNOTATION(assembled_contigs)
@@ -41,6 +39,9 @@ workflow {
 
     // Run Kraken2 on trimmed reads
     kraken_results = KRAKEN2(trimmed_reads)
+    
+    // Run cgMLST analysis on assembled genomes
+    cgmlst_results = CGMLST(assembled_contigs)
 }
 
 workflow.onComplete = {

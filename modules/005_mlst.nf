@@ -4,8 +4,8 @@ process MLST {
     publishDir params.outdir + "/mlst/", mode: 'copy'
 
     input:
-    tuple val(sample_id), path(assembled_genome)
-
+    tuple val(sample_id), path(assembly_dir)  
+    
     output:
     tuple val(sample_id), path("mlst_output/${sample_id}_mlst.tsv"),
     path("mlst_output/mlst_summary.tsv")
@@ -13,7 +13,9 @@ process MLST {
     script:
     """
     mkdir -p mlst_output
-    mlst $assembled_genome > mlst_output/${sample_id}_mlst.tsv --threads 2
+
+    # Define the correct FASTA file path using Nextflow's variable expansion
+    mlst "${assembly_dir}/assembly.fasta" > mlst_output/${sample_id}_mlst.tsv --threads 2
 
     # Append to summary file
     if [[ ! -s mlst_output/mlst_summary.tsv ]]; then
