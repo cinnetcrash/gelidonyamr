@@ -1,4 +1,4 @@
-![Gelidonyamr Header](visuals/gelidonyAMR.png)
+![Gelidonyamr Header](https://raw.githubusercontent.com/cinnetcrash/gelidonyamr/main/visuals/gelidonyAMR.png)
 
 
 # **Salmoline: Salmonella Infantis Nextflow Pipeline**
