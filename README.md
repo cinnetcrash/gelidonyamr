@@ -1,12 +1,15 @@
+![Gelidonyamr Header](visuals/gelidonyAMR.png)
+
+
 # **Salmoline: Salmonella Infantis Nextflow Pipeline**
 
-## 📝 Overview
+## Overview
 This Nextflow pipeline, **Salmoline**, has been developed for analyzing *Salmonella Infantis* genomes, including **genome assembly, antimicrobial resistance (AMR) profiling, and cgMLST typing**. It is designed for use in a **Conda environment** and is part of the PhD project:
 
 > **"Determination of Evolutionary Structure and Antimicrobial Resistance Profile of *Salmonella Infantis*"**
 
-## 🔧 Installation
-### 📦 Required Dependencies
+## Installation
+### Required Dependencies
 Ensure that **Conda** is installed and up to date before proceeding. The following **Conda packages** must be installed to run the pipeline:
 
 #### **Create the Conda Environment**
@@ -23,7 +26,7 @@ If the environment is already created, simply activate it:
 conda activate salmoline
 ```
 
-### 📂 Additional Requirements
+### Additional Requirements
 #### **Abricate Databases**
 Ensure that the necessary **AMR databases** are installed:
 ```bash
@@ -37,13 +40,13 @@ List all the required **databases** that have been used in this pipeline.
 chewBBACA_downloadDB -sp "Salmonella" -o INNUENDO_salmonella
 ```
 
-## 📌 Reference Genome
+## Reference Genome
 The **reference genome** used in this pipeline:
 - **Organism**: *Salmonella Infantis*
 - **Reference Accession**: `LN649235.1`
 - **NCBI Assembly**: `GCA_000953495.1`
 
-## 🚀 Running the Pipeline
+## Running the Pipeline
 To execute the pipeline, use the following command:
 
 ```bash
@@ -55,10 +58,10 @@ nextflow run main.nf --reads "../input_folder/*.fastq" --outdir Results -c confi
 - **Docker support is planned** for future releases.
 - A similar pipeline is planned for *Enterohemorrhagic Escherichia coli* (**EHEC**).
 
-## 📖 Citation
+## Citation
 The publication associated with this pipeline is **not yet available**. Updates will be provided when the citation is published.
 
-## ❓ Issues & Contact
+## Issues & Contact
 If you encounter any **issues** while running the pipeline, please let me know.
 
 ---
