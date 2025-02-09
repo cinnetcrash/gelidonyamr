@@ -10,7 +10,7 @@ The name **GelidonyAMR** is inspired by the **Gelidonya Lighthouse**, a historic
 Just as the lighthouse has guided sailors for centuries, **GelidonyAMR** serves as a bioinformatics beacon for detecting **antimicrobial resistance (AMR) genes** in *Salmonella Infantis* and other foodborne pathogens. Inspired by my personal connection to this remote and timeless place, this pipeline bridges ancient landscapes with cutting-edge technology, illuminating hidden threats in microbial genomes to safeguard public health.
 
 ## Overview
-This Nextflow pipeline, **gelidonyAR**, has been developed for analyzing *Salmonella Infantis* genomes, including **genome assembly, antimicrobial resistance (AMR) profiling, and cgMLST typing**. It is designed for use in a **Conda environment** and is part of the PhD project:
+This Nextflow pipeline, **gelidonyAMR**, has been developed for analyzing *Salmonella Infantis* genomes, including **genome assembly, antimicrobial resistance (AMR) profiling, MLST and cgMLST typing**. It is designed for use in a **Conda environment** and is part of the PhD project:
 
 > **"Determination of Evolutionary Structure and Antimicrobial Resistance Profile of *Salmonella Infantis*"**
 
