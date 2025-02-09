@@ -19,17 +19,17 @@ This Nextflow pipeline, **gelidonyAR**, has been developed for analyzing *Salmon
 Ensure that **Conda** is installed and up to date before proceeding. The following **Conda packages** must be installed to run the pipeline:
 
 #### **Create the Conda Environment**
-To create and activate the Conda environment for Salmoline, use:
+To create and activate the Conda environment for gelidonyAMR, use:
 
 ```bash
 conda env create -f environment.yaml
-conda activate salmoline
+conda activate gelidonyamr
 ```
 
 If the environment is already created, simply activate it:
 
 ```bash
-conda activate salmoline
+conda activate gelidonyamr
 ```
 
 ### Additional Requirements
