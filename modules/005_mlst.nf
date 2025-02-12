@@ -15,7 +15,7 @@ process MLST {
     mkdir -p mlst_output
 
     # Define the correct FASTA file path using Nextflow's variable expansion
-    mlst "${assembly_dir}/assembly.fasta" > mlst_output/${sample_id}_mlst.tsv --threads 2
+    mlst "${assembly_dir}/assembly.fasta" > mlst_output/${sample_id}_mlst.tsv --threads 3
 
     # Append to summary file
     if [[ ! -s mlst_output/mlst_summary.tsv ]]; then

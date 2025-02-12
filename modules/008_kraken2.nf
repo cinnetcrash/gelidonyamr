@@ -23,6 +23,6 @@ process KRAKEN2 {
             --classified-out kraken2_output/${sample_id}_kraken2_classified.txt \\
             --use-names --report-zero-counts --use-mpa-style \\
             --threads ${task.cpus} \\
-            $trimmed_reads --threads 2 --memory-mapping
+            $trimmed_reads --threads 3 --memory-mapping
     """
 }

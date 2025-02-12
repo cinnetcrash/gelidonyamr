@@ -12,6 +12,6 @@ process TRIMMING {
     script:
     """
     mkdir -p trimmed_reads
-    fastp -i $reads_file -o trimmed_reads/${sample_id}_trimmed.fastq -h trimmed_reads/${sample_id}.html -w 4 -j trimmed_reads/${sample_id}.json -R trimmed_reads/${sample_id}_report.json
+    fastp -i $reads_file -o trimmed_reads/${sample_id}_trimmed.fastq -h trimmed_reads/${sample_id}.html -w 3 -j trimmed_reads/${sample_id}.json -R trimmed_reads/${sample_id}_report.json
     """
 }
