@@ -56,7 +56,7 @@ The **reference genome** used in this pipeline:
 To execute the pipeline, use the following command:
 
 ```bash
-nextflow run main.nf --reads "../input_folder/*.fastq" --outdir Results -c config/nextflow.config
+nextflow run cinnetcrash/gelidonyamr --reads "../input_folder/*.fastq" --outdir Results -c config/nextflow.config
 ```
 
 ## Environment Considerations
