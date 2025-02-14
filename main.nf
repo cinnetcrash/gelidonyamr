@@ -10,7 +10,7 @@ include { MLST } from './modules/005_mlst.nf'
 include { CGMLST } from './modules/006_cgmlst.nf'
 include { MULTIQC } from './modules/009_multiqc.nf'
 include { KRAKEN2 } from './modules/008_kraken2.nf'
-include { CLAIR3 } from './modules/010_clair3.nf'
+include { CLAIR3 } from './modules/010_clair.nf'
 include { BUSCO } from './modules/011_busco.nf'
 include { QUAST } from './modules/012_quast.nf'
 
