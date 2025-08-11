@@ -32,7 +32,7 @@ workflow {
     amr_results = AMR(amr_ready)
 
     // Run MultiQC (after FASTQC)
-    multiqc_out = MULTIQC(fastqc_out.collect())  // Ensures all reports are collected first
+    multiqc_out = MULTIQC(fastqc_out)
 
     // Run annotation on assembled contigs
     annotated_genomes = ANNOTATION(assembled_contigs)
@@ -46,23 +46,23 @@ workflow {
     // Run cgMLST analysis on assembled genomes
     cgmlst_results = CGMLST(assembled_contigs)
 
-    // Output the final results// Run Clair3 for variant calling
-    CLAIR3(trimmed_reads)
+    // Run Clair3 for variant calling
+    clair3_results = CLAIR3(trimmed_reads)
 
     // QUAST to check assembly quality
-    QUAST(assembled_contigs)
+    quast_results = QUAST(assembled_contigs)
 
     // BUSCO to check genome completeness
-    BUSCO(assembled_contigs)
+    busco_results = BUSCO(assembled_contigs)
 }
 
-workflow.onComplete = {
+workflow.onComplete {
     def endTime = new Date()
     println "[${endTime}] Pipeline başarı ile tamamlandı."
-    println "[${endTime}] Command line: $workflow.commandLine"
+    println "[${endTime}] Command line: ${workflow.commandLine}"
 }
 
-workflow.onError = { err ->
+workflow.onError { err ->
     def errorTime = new Date()
     println "[${errorTime}] Logları kontrol edin!"
 }
