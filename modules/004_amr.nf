@@ -1,5 +1,5 @@
 process AMR {
-    tag "AMR Analizi Yapılıyor...: Abricate"
+    tag "AMR Analysis: Abricate"
 
     publishDir params.outdir + "/amr/", mode: 'copy'
 

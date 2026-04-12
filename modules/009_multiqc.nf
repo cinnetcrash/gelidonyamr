@@ -1,5 +1,5 @@
 process MULTIQC {
-    tag "MultiQC Raporu Oluşturuluyor..."
+    tag "Aggregate QC Report: MultiQC"
 
     publishDir params.outdir + "/multiqc/", mode: 'copy'
 

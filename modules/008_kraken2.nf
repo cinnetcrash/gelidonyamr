@@ -1,5 +1,5 @@
 process KRAKEN2 {
-    tag "Kraken2 Analizi Yapılıyor..."
+    tag "Taxonomic Classification: Kraken2"
 
     publishDir "${params.outdir}/kraken2/", mode: 'copy'
 
@@ -23,6 +23,7 @@ process KRAKEN2 {
             --classified-out kraken2_output/${sample_id}_kraken2_classified.txt \\
             --use-names --report-zero-counts --use-mpa-style \\
             --threads ${task.cpus} \\
-            $trimmed_reads --threads 3 --memory-mapping
+            --memory-mapping \\
+            $trimmed_reads
     """
 }

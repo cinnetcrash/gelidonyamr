@@ -1,5 +1,5 @@
 process ANNOTATION {
-    tag "Anotasyon İşlemi Yapılıyor...: Prokka"
+    tag "Genome Annotation: Prokka"
 
     publishDir params.outdir + "/annotation/", mode: 'copy'
 

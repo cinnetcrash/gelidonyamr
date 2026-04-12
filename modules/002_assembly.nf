@@ -1,5 +1,5 @@
 process ASSEMBLY {
-    tag "Genom Montajlama İşlemi Yapılıyor...: Flye"
+    tag "Genome Assembly: Flye"
 
     publishDir params.outdir + "/assembly/", mode: 'copy'
 
