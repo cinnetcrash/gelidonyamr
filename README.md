@@ -1,4 +1,4 @@
-![GelidonyAMR Header](/visuals/gelindonyAMR.png)
+![GelidonyAMR Header](/visuals/gelindonyAMR_3.png)
 
 # gelidonyAMR
 
