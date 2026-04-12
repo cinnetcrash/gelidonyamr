@@ -1,5 +1,5 @@
 process IQTREE {
-    tag "ML Filogeni: IQ-TREE"
+    tag "ML Phylogeny: IQ-TREE"
 
     publishDir "${params.outdir}/iqtree/", mode: 'copy'
 

@@ -1,5 +1,5 @@
 process SNPEFF {
-    tag "Varyant Anotasyonu: snpEff"
+    tag "Variant Annotation: snpEff"
 
     publishDir "${params.outdir}/snpeff/", mode: 'copy'
 

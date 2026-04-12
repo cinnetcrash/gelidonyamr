@@ -1,5 +1,5 @@
 process FASTANI {
-    tag "Tür Doğrulama: FastANI"
+    tag "Species Verification: FastANI"
 
     publishDir "${params.outdir}/fastani/", mode: 'copy'
 

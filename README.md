@@ -2,24 +2,24 @@
 
 # gelidonyAMR
 
-**Oxford Nanopore Tabanlı *Salmonella Infantis* Genomik Epidemiyoloji Pipeline'ı**
+**Oxford Nanopore-based *Salmonella Infantis* Genomic Epidemiology Pipeline**
 
 ---
 
-The name **GelidonyAMR** is inspired by the **Gelidonya Lighthouse**, a historic maritime landmark on the southern coast of Türkiye. Just as the lighthouse has guided sailors for centuries, GelidonyAMR serves as a bioinformatics beacon for detecting antimicrobial resistance genes in *Salmonella Infantis* and other foodborne pathogens.
+The name **GelidonyAMR** is inspired by the **Gelidonya Lighthouse**, a historic maritime landmark on the southern coast of Türkiye, near Finike. Just as the lighthouse has guided sailors for centuries, GelidonyAMR serves as a bioinformatics beacon for detecting antimicrobial resistance genes in *Salmonella Infantis* and other foodborne pathogens.
 
 > **PhD Project:** *"Determination of Evolutionary Structure and Antimicrobial Resistance Profile of Salmonella Infantis"*
 
 ---
 
-## Pipeline Genel Bakış
+## Pipeline Overview
 
 ```
-INPUT (SRA listesi veya FASTQ klasörü)
+INPUT  (SRA accession list  OR  local FASTQ folder)
         │
         ▼
 ┌───────────────────────────────────┐
-│  Kalite Kontrol                   │
+│  Quality Control                  │
 │  FastQC · fastp · Kraken2         │
 └────────────────┬──────────────────┘
                  │
@@ -32,49 +32,49 @@ INPUT (SRA listesi veya FASTQ klasörü)
                  ▼
 ┌───────────────────────────────────┐
 │  Polishing & Assembly QC          │
-│  Minimap2 + Racon (4×) · Clair3  │
+│  Minimap2 + Racon (4x) · Clair3  │
 │  QUAST · BUSCO · CheckM           │
 └────────────────┬──────────────────┘
                  │
         ┌────────┴────────┐
         ▼                 ▼
 ┌──────────────┐  ┌────────────────┐
-│  Anotasyon   │  │ Tür Doğrulama  │
+│  Annotation  │  │ Species Check  │
 │  Prokka      │  │ FastANI        │
 │  Bakta       │  └────────────────┘
 └──────┬───────┘
        │
-       ├──── AMR Analizi ──────── AMRFinderPlus · Abricate (7 DB)
+       ├── AMR Analysis ────── AMRFinderPlus · Abricate (7 databases)
        │
-       ├──── Plazmid Analizi ──── PlasmidFinder · MobSuite
+       ├── Plasmid Analysis ── PlasmidFinder · MobSuite
        │
-       ├──── Moleküler Tipleme ── MLST · cgMLST · PopPUNK
+       ├── Molecular Typing ── MLST · cgMLST · PopPUNK
        │
-       ├──── Filogeni ──────────── Parsnp · Roary → IQ-TREE
+       ├── Phylogenomics ────── Parsnp · Roary → IQ-TREE
        │
-       ├──── Prophage ──────────── PHASTER
+       ├── Prophage ──────────── PHASTER
        │
-       └──── Varyant Anotasyonu ── Clair3 → snpEff
+       └── Variant Annotation ── Clair3 → snpEff
 ```
 
 ---
 
-## Gereksinimler
+## Requirements
 
-- **İşletim Sistemi:** Linux (Ubuntu 20.04+ önerilir)
-- **Conda / Mamba:** Ortam yönetimi için
-- **Nextflow:** ≥ 23.10.0
-- **Java:** 11 veya üzeri (Nextflow için)
+- **Operating System:** Linux (Ubuntu 20.04+ recommended)
+- **Conda / Mamba:** for environment management
+- **Nextflow:** >= 23.10.0
+- **Java:** 11 or higher (required by Nextflow)
 
-> **Not:** PHASTER adımı internet bağlantısı gerektirir (https://phaster.ca API'si kullanılır).
+> **Note:** The PHASTER step requires an internet connection — it submits assemblies to the PHASTER web API (https://phaster.ca).
 
 ---
 
-## Kurulum
+## Installation
 
-### 1. Conda Ortamını Oluştur
+### 1. Create the Conda Environment
 
-Çok sayıda araç içerdiğinden standart `conda` yerine `mamba` kullanılması **şiddetle tavsiye edilir** (10-20 kat daha hızlı çözümleme):
+This pipeline includes many tools. Using **mamba** instead of standard `conda` is **strongly recommended** — it resolves dependencies 10-20x faster:
 
 ```bash
 conda install -n base -c conda-forge mamba
@@ -82,26 +82,23 @@ mamba env create -f environment.yaml
 conda activate gelidonyamr
 ```
 
-> **Bağımlılık uyarısı:** `chewBBACA`, `clair3` ve `poppunk` bazı sistemlerde çakışma yaratabilir.
-> Bu durumda aşağıdaki araçları ayrı bir ortamda kurmanız önerilir.
-> Nextflow her işlemi ayrı bir work dizininde çalıştırdığı için ortam geçişi otomatik yapılabilir.
+> **Dependency note:** `chewBBACA`, `clair3`, and `poppunk` can occasionally conflict with each other's Python requirements. If the environment fails to solve, try installing these in a separate environment and use Nextflow's `conda` process directive to assign them individually.
 
-### 2. Veritabanlarını İndir
+### 2. Set Up Databases
 
 #### Kraken2
 ```bash
-# Standart veritabanı (~60 GB)
 kraken2-build --standard --db /home/analysis/kraken2_db --threads 8
 ```
 
 #### Abricate
 ```bash
 abricate --setupdb
-abricate --list     # Kurulu DB'leri kontrol et
+abricate --list     # Verify installed databases
 ```
 
-#### ChewBBACA cgMLST Şeması
-Pipeline çalışırken otomatik indirilir. Manuel indirmek için:
+#### chewBBACA cgMLST Schema
+Downloaded automatically at runtime. To download manually:
 ```bash
 chewBBACA.py DownloadSchema -sp 8 -sc 1 -o data/cgmlst/
 ```
@@ -113,28 +110,27 @@ bakta_db download --output /home/analysis/bakta_db --type full
 
 #### PlasmidFinder
 ```bash
-# Resmi PlasmidFinder veritabanı
 git clone https://bitbucket.org/genomicepidemiology/plasmidfinder_db.git /home/analysis/plasmidfinder_db
 ```
 
-#### snpEff — Salmonella Veritabanı
+#### snpEff — Salmonella Database
 ```bash
 snpEff download Salmonella_enterica
 ```
 
-#### SRA Toolkit Yapılandırması (opsiyonel, indirme hızı için)
+#### SRA Toolkit Configuration *(optional — improves download speed)*
 ```bash
 vdb-config --interactive
-# Önbellek dizinini ve ağ ayarlarını yapılandırın
+# Configure cache directory and cloud endpoint
 ```
 
 ---
 
-## Çalıştırma
+## Running the Pipeline
 
-### Mod 1 — FASTQ Klasörü ile
+### Mode 1 — Local FASTQ Folder
 
-Elinizdeki Nanopore FASTQ dosyalarını bir klasöre koyun:
+Place your Nanopore FASTQ files in a folder:
 
 ```
 input_folder/
@@ -150,9 +146,9 @@ nextflow run main.nf \
   -c config/nextflow.config
 ```
 
-### Mod 2 — NCBI SRA Listesi ile
+### Mode 2 — NCBI SRA Accession List
 
-NCBI'dan doğrudan indirmek için bir TXT dosyası oluşturun:
+Create a plain text file with one accession per line:
 
 ```
 # sra_accessions.txt
@@ -162,9 +158,9 @@ SRR12345680
 ERR9876543
 ```
 
-- Her satırda bir akesyon numarası (SRR / ERR / DRR)
-- `#` ile başlayan satırlar yorum olarak göz ardı edilir
-- Boş satırlar otomatik atlanır
+- Accepts SRR, ERR, and DRR prefixes
+- Lines starting with `#` are treated as comments and ignored
+- Blank lines are skipped automatically
 
 ```bash
 nextflow run main.nf \
@@ -173,159 +169,156 @@ nextflow run main.nf \
   -c config/nextflow.config
 ```
 
-> `--reads` ve `--sra_list` aynı anda kullanılamaz. `--sra_list` verilmişse `--reads` göz ardı edilir.
+> `--reads` and `--sra_list` cannot be used together. If `--sra_list` is provided, `--reads` is ignored.
 
-### Ek Çalıştırma Seçenekleri
+### Additional Run Options
 
 ```bash
-# Yarıda kalan pipeline'ı kaldığı yerden devam ettir
+# Resume a pipeline that was interrupted
 nextflow run main.nf -resume --reads "input_folder/*.fastq" -c config/nextflow.config
 
-# Rapor ve zaman çizelgesi ile
+# Generate HTML execution report and timeline
 nextflow run main.nf --reads "input_folder/*.fastq" -c config/nextflow.config \
   -with-report pipeline_report.html \
   -with-timeline pipeline_timeline.html
-
-# Belirli bir iş (örn. sadece assembly testi için) — Nextflow -entry henüz desteklenmez,
-# modülleri geçici olarak main.nf'den yorum satırına alabilirsiniz.
 ```
 
 ---
 
-## Parametreler
+## Parameters
 
-| Parametre | Varsayılan | Açıklama |
-|-----------|-----------|----------|
-| `--reads` | `input_folder/*.fastq` | FASTQ dosyalarının yolu (glob desteklenir) |
-| `--sra_list` | `null` | SRR akesyon numaralarının bulunduğu TXT dosyası |
-| `--outdir` | `Results` | Tüm çıktıların yazılacağı dizin |
-| `--ref_genome` | `data/ref_genome.fna` | Referans genom (Clair3, FastANI, Parsnp için) |
-| `--kraken2_db` | `/home/analysis/kraken2_db` | Kraken2 veritabanı dizini |
-| `--clair3_model` | `/opt/models/r941_prom_hac_g360+g422` | ONT kimya modeli |
-| `--bakta_db` | `/home/analysis/bakta_db` | Bakta veritabanı dizini |
-| `--plasmidfinder_db` | `/home/analysis/plasmidfinder_db` | PlasmidFinder veritabanı dizini |
-| `--snpeff_db` | `Salmonella_enterica` | snpEff organizma veritabanı adı |
-| `--max_cpu` | `14` | Maksimum CPU çekirdeği sayısı |
-| `--max_memory` | `14GB` | Maksimum bellek |
-| `--max_time` | `24h` | Maksimum çalışma süresi |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `--reads` | `input_folder/*.fastq` | Path to FASTQ files (glob patterns supported) |
+| `--sra_list` | `null` | Path to TXT file containing SRA accession numbers |
+| `--outdir` | `Results` | Directory where all results will be written |
+| `--ref_genome` | `data/ref_genome.fna` | Reference genome (used by Clair3, FastANI, Parsnp) |
+| `--kraken2_db` | `/home/analysis/kraken2_db` | Kraken2 database directory |
+| `--clair3_model` | `/opt/models/r941_prom_hac_g360+g422` | Clair3 ONT chemistry model path |
+| `--bakta_db` | `/home/analysis/bakta_db` | Bakta database directory |
+| `--plasmidfinder_db` | `/home/analysis/plasmidfinder_db` | PlasmidFinder database directory |
+| `--snpeff_db` | `Salmonella_enterica` | snpEff organism database name |
+| `--max_cpu` | `14` | Maximum CPU threads |
+| `--max_memory` | `14GB` | Maximum memory |
+| `--max_time` | `24h` | Maximum run time |
 
 ---
 
-## Çıktı Dizin Yapısı
+## Output Directory Structure
 
 ```
 Results/
-├── raw_reads/          # SRA modunda indirilen FASTQ dosyaları
-├── fastqc/             # FastQC kalite raporları
-├── trimmed/            # fastp ile kırpılmış okumalar
-├── kraken2/            # Taksonomi sınıflandırma sonuçları
-├── assembly/           # Flye ham assembly çıktıları
-├── polished/           # Minimap2 + Racon ile cilalı genomlar (kullanılan)
-├── quast/              # Assembly kalite metrikleri
-├── busco/              # Genom tamlık değerlendirmesi
-├── checkm/             # Kontaminasyon / tamlık kontrolü
-├── fastani/            # Tür doğrulama (ANI değerleri)
-├── annotation/         # Prokka anotasyon dosyaları (.gff, .gbk, .faa)
-├── bakta/              # Bakta anotasyon dosyaları
-├── amr/                # Abricate sonuçları (7 veritabanı)
-├── amrfinder/          # AMRFinder Plus sonuçları
-├── mobsuite/           # Plazmid rekonstruksiyon ve mobilizasyon analizi
-├── plasmidfinder/      # Replikon tipleme sonuçları
-├── mlst/               # 7-gen MLST tipleme
-├── cgmlst/             # chewBBACA cgMLST / wgMLST
-├── clair3/             # Varyant çağırma (VCF)
-├── snpeff/             # Varyant anotasyonu
-├── phaster/            # Profaj tespiti (JSON)
-├── roary/              # Pan-genom analizi (core/accessory)
-├── iqtree/             # ML filogenetik ağaç
-├── parsnp/             # Core SNP analizi
-├── poppunk/            # Popülasyon yapısı ve kümeler
-├── multiqc/            # Tüm QC çıktılarının özet raporu
-└── pipeline_info/      # Nextflow zaman çizelgesi ve raporu
+├── raw_reads/          # FASTQ files downloaded from SRA (SRA mode only)
+├── fastqc/             # Per-sample FastQC HTML reports
+├── trimmed/            # fastp-trimmed reads
+├── kraken2/            # Taxonomic classification reports
+├── assembly/           # Raw Flye assembly output
+├── polished/           # Final polished genomes (Minimap2 + Racon 4x)
+├── quast/              # Assembly quality metrics (N50, contigs, etc.)
+├── busco/              # Genome completeness scores
+├── checkm/             # Contamination and completeness assessment
+├── fastani/            # Species verification (ANI values vs. reference)
+├── annotation/         # Prokka output (.gff, .gbk, .faa, .ffn)
+├── bakta/              # Bakta annotation output
+├── amr/                # Abricate results across 7 databases
+├── amrfinder/          # NCBI AMRFinder Plus results
+├── mobsuite/           # Plasmid reconstruction and mobility typing
+├── plasmidfinder/      # Replicon-based plasmid typing
+├── mlst/               # 7-gene MLST profiles
+├── cgmlst/             # chewBBACA cgMLST / wgMLST allele calls
+├── clair3/             # Variant calls (VCF)
+├── snpeff/             # Annotated VCF files
+├── phaster/            # Prophage detection results (JSON)
+├── roary/              # Pan-genome analysis (core / accessory genes)
+├── iqtree/             # Maximum likelihood phylogenetic tree
+├── parsnp/             # Core SNP alignment and tree
+├── poppunk/            # Population structure clusters
+├── multiqc/            # Aggregated QC report across all samples
+└── pipeline_info/      # Nextflow execution timeline and report
 ```
 
 ---
 
-## Araç Referansı
+## Tool Reference
 
-| Adım | Araç | Sürüm |
-|------|------|-------|
-| SRA İndirme | SRA Toolkit (fasterq-dump) | ≥3.0 |
-| Kalite Kontrol | FastQC | 0.12.1 |
-| Trimming | fastp | 0.24.0 |
-| Taksonomi | Kraken2 | 2.1.3 |
-| Assembly | Flye | 2.9 |
+| Step | Tool | Version |
+|------|------|---------|
+| SRA Download | SRA Toolkit (fasterq-dump) | ≥3.0 |
+| Quality Control | FastQC | 0.12.1 |
+| Read Trimming | fastp | 0.24.0 |
+| Taxonomic Classification | Kraken2 | 2.1.3 |
+| Genome Assembly | Flye | 2.9 |
 | Polishing | Minimap2 + Racon | ≥2.26 / ≥1.5 |
-| Varyant Çağırma | Clair3 | ≥1.0 |
-| Assembly QC | QUAST | 5.3.0 |
-| Genom Tamlık | BUSCO | 5.7.1 |
-| Kalite Denetim | CheckM | ≥1.2 |
-| Tür Doğrulama | FastANI | ≥1.34 |
-| Anotasyon | Prokka + Bakta | ≥1.14 / ≥1.9 |
-| AMR | AMRFinder Plus | ≥3.12 |
-| AMR | Abricate | 1.0.1 |
-| Plazmid | PlasmidFinder | ≥2.1 |
-| Plazmid | MobSuite | ≥3.1 |
-| Tipleme | MLST | 2.23.0 |
-| Tipleme | chewBBACA | 3.3.6 |
-| Prophage | PHASTER | Web API |
-| Varyant Anotasyon | snpEff | ≥5.2 |
-| Pan-Genom | Roary | ≥3.13 |
-| Filogeni | IQ-TREE2 | ≥2.3 |
-| Core SNP | Parsnp | ≥2.0 |
-| Popülasyon | PopPUNK | ≥2.6 |
-| QC Özet | MultiQC | 1.27 |
+| Variant Calling | Clair3 | ≥1.0 |
+| Assembly Quality | QUAST | 5.3.0 |
+| Genome Completeness | BUSCO | 5.7.1 |
+| Quality Assessment | CheckM | ≥1.2 |
+| Species Verification | FastANI | ≥1.34 |
+| Annotation | Prokka + Bakta | ≥1.14 / ≥1.9 |
+| AMR Detection | AMRFinder Plus | ≥3.12 |
+| AMR Detection | Abricate | 1.0.1 |
+| Plasmid Typing | PlasmidFinder | ≥2.1 |
+| Plasmid Reconstruction | MobSuite | ≥3.1 |
+| MLST | mlst | 2.23.0 |
+| cgMLST / wgMLST | chewBBACA | 3.3.6 |
+| Prophage Detection | PHASTER | Web API |
+| Variant Annotation | snpEff | ≥5.2 |
+| Pan-Genome | Roary | ≥3.13 |
+| ML Phylogeny | IQ-TREE2 | ≥2.3 |
+| Core SNP Phylogeny | Parsnp | ≥2.0 |
+| Population Structure | PopPUNK | ≥2.6 |
+| QC Aggregation | MultiQC | 1.27 |
 
 ---
 
-## Referans Genom
+## Reference Genome
 
-- **Organizma:** *Salmonella enterica* subsp. *enterica* serovar Infantis
-- **Akesyon:** `LN649235.1`
+- **Organism:** *Salmonella enterica* subsp. *enterica* serovar Infantis
+- **Accession:** `LN649235.1`
 - **NCBI Assembly:** `GCA_000953495.1`
 
-Referans genomu indirmek için:
+Download the reference genome:
 ```bash
 datasets download genome accession GCA_000953495.1 --include genome
 ```
 
 ---
 
-## Sık Sorulan Sorular
+## Frequently Asked Questions
 
-**S: SRA adımı için ekstra bir şey yapmalı mıyım?**
+**Q: Do I need to configure anything extra for the SRA mode?**
 
-Hayır. `--sra_list` parametresine TXT dosyanızın yolunu verin, pipeline her şeyi halleder.
-Tek gereksinim: `sra-tools` paketinin conda ortamında kurulu olması (environment.yaml ile otomatik kurulur).
-İndirme hızını artırmak için `vdb-config --interactive` ile AWS/GCP yönlendirmesini yapılandırabilirsiniz.
+No. Simply pass `--sra_list` with the path to your accession file — the pipeline handles the rest.
+The only requirement is that `sra-tools` is installed (included in `environment.yaml`).
+Optionally, run `vdb-config --interactive` to configure AWS/GCP cloud endpoints for faster downloads.
 
-**S: Tüm araçlar tek bir conda ortamında çalışıyor mu?**
+**Q: Do all tools run inside a single conda environment?**
 
-Araçların büyük çoğunluğu `bioconda` kanalı aracılığıyla conda ile kurulabilir.
-Ancak `chewBBACA`, `clair3` ve `poppunk` bazı Python bağımlılıklarında çakışma yaratabilir.
-Sorun yaşarsanız `mamba` kullanın — standart `conda`'ya göre bağımlılıkları çok daha iyi çözümler.
-PHASTER için lokal kurulum gerekmez; pipeline web API üzerinden çalışır (internet bağlantısı gerekli).
+Most tools are available through the `bioconda` channel and can be installed via conda.
+However, `chewBBACA`, `clair3`, and `poppunk` can produce Python dependency conflicts.
+Use **mamba** instead of `conda` for significantly better dependency resolution.
+PHASTER requires no local installation — it runs entirely through the web API.
 
-**S: Pipeline yarıda kaldı, nasıl devam ettiririm?**
+**Q: The pipeline stopped midway. How do I resume it?**
 
 ```bash
 nextflow run main.nf -resume --reads "input_folder/*.fastq" -c config/nextflow.config
 ```
 
-`-resume` bayrağı Nextflow'un tamamlanan adımları önbellekten okumasını sağlar.
+The `-resume` flag tells Nextflow to reuse cached results from completed steps.
 
-**S: Sadece birkaç adımı çalıştırabilir miyim?**
+**Q: Can I run only specific steps?**
 
-`main.nf` içinde çalıştırmak istemediğiniz adımları `//` ile yorum satırına alabilirsiniz.
-
----
-
-## Katkıda Bulunma / İletişim
-
-Sorunlar için GitHub Issues kullanın veya doğrudan iletişime geçin.
+Comment out the steps you don't need in `main.nf` using `//` and re-run. Nextflow's `-resume` flag ensures previously completed steps are not repeated.
 
 ---
 
-**Pipeline Geliştirici:** Gültekin Ünal
+## Issues & Contact
 
-*Gelidonya Deniz Feneri'nden ilham alınmıştır — Finike, Türkiye*
+For bug reports or feature requests, please open a GitHub issue.
+
+---
+
+**Pipeline Developer:** Gültekin Ünal
+
+*Inspired by the Gelidonya Lighthouse — Finike, Türkiye*

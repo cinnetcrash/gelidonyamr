@@ -1,5 +1,5 @@
 process PHASTER {
-    tag "Profaj Tespiti: PHASTER"
+    tag "Prophage Detection: PHASTER"
 
     publishDir "${params.outdir}/phaster/", mode: 'copy'
 
@@ -13,7 +13,7 @@ process PHASTER {
     """
     mkdir -p phaster_output
 
-    # PHASTER API'ye gönder
+    # Submit genome to PHASTER API
     response=\$(curl -s --data-urlencode "seq@${assembly_dir}/assembly.fasta" \\
         "https://phaster.ca/phaster_api")
     job_id=\$(echo "\$response" | python3 -c "import sys,json; print(json.load(sys.stdin).get('job_id',''))")
@@ -25,7 +25,7 @@ process PHASTER {
 
     echo "PHASTER job ID: \$job_id"
 
-    # Tamamlanana kadar her 2 dakikada bir kontrol et
+    # Poll for completion every 2 minutes
     while true; do
         result=\$(curl -s "https://phaster.ca/phaster_api?acc=\${job_id}")
         status=\$(echo "\$result" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','0'))" 2>/dev/null || echo "0")

@@ -1,5 +1,5 @@
 process RACON {
-    tag "Polishing: Minimap2 + Racon (4×)"
+    tag "Polishing: Minimap2 + Racon (4x)"
 
     publishDir "${params.outdir}/polished/", mode: 'copy'
 
@@ -13,10 +13,10 @@ process RACON {
     """
     mkdir -p polished_output/${sample_id}_polished
 
-    # Başlangıç assembly'yi kopyala
+    # Copy initial assembly as starting point
     cp ${assembly_dir}/assembly.fasta polished_output/${sample_id}_polished/assembly.fasta
 
-    # 4 tur Racon polishing
+    # 4 rounds of Racon polishing
     for i in 1 2 3 4; do
         minimap2 -ax map-ont -t ${task.cpus} \\
             polished_output/${sample_id}_polished/assembly.fasta \\
@@ -28,12 +28,12 @@ process RACON {
             polished_output/${sample_id}_polished/assembly.fasta \\
             > polished_output/${sample_id}_polished/racon_round\${i}.fasta
 
-        # Sonraki tur için güncelle
+        # Update assembly for next round
         cp polished_output/${sample_id}_polished/racon_round\${i}.fasta \\
            polished_output/${sample_id}_polished/assembly.fasta
     done
 
-    # Ara dosyaları temizle
+    # Remove intermediate files
     rm -f mappings_round*.paf
     rm -f polished_output/${sample_id}_polished/racon_round*.fasta
     """

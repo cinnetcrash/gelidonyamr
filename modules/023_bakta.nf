@@ -1,5 +1,5 @@
 process BAKTA {
-    tag "Anotasyon: Bakta"
+    tag "Genome Annotation: Bakta"
 
     publishDir "${params.outdir}/bakta/", mode: 'copy'
 

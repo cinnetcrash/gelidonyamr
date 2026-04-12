@@ -1,5 +1,5 @@
 process PLASMIDFINDER {
-    tag "Plazmid Tespiti: PlasmidFinder"
+    tag "Plasmid Typing: PlasmidFinder"
 
     publishDir "${params.outdir}/plasmidfinder/", mode: 'copy'
 

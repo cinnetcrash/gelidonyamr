@@ -1,5 +1,5 @@
 process ROARY {
-    tag "Pan-Genom Analizi: Roary"
+    tag "Pan-Genome Analysis: Roary"
 
     publishDir "${params.outdir}/roary/", mode: 'copy'
 

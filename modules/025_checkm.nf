@@ -1,5 +1,5 @@
 process CHECKM {
-    tag "Genom Kalite Kontrolü: CheckM"
+    tag "Genome Quality: CheckM"
 
     publishDir "${params.outdir}/checkm/", mode: 'copy'
 
@@ -23,7 +23,7 @@ process CHECKM {
         -x fasta \\
         --reduced_tree
 
-    # Özet tablosu
+    # Export summary table
     checkm qa \\
         checkm_output/${sample_id}/lineage.ms \\
         checkm_output/${sample_id}/ \\

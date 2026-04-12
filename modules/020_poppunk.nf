@@ -1,5 +1,5 @@
 process POPPUNK {
-    tag "Popülasyon Yapısı: PopPUNK"
+    tag "Population Structure: PopPUNK"
 
     publishDir "${params.outdir}/poppunk/", mode: 'copy'
 
@@ -13,13 +13,13 @@ process POPPUNK {
     """
     mkdir -p poppunk_output
 
-    # Girdi dosyası oluştur (örnek_id <tab> assembly_yolu)
+    # Build input file (sample_id <tab> assembly_path)
     for dir in ${assembly_dirs}; do
         sample=\$(basename \$dir)
         echo -e "\${sample}\\t\${dir}/assembly.fasta"
     done > poppunk_input.txt
 
-    # Veritabanı oluştur
+    # Create sketch database
     poppunk --create-db \\
             --r-files poppunk_input.txt \\
             --output poppunk_output/db \\
@@ -27,13 +27,13 @@ process POPPUNK {
             --k-step 4 \\
             --threads ${task.cpus}
 
-    # Model uydur (BGMM)
+    # Fit BGMM model
     poppunk --fit-model bgmm \\
             --ref-db poppunk_output/db \\
             --output poppunk_output/db \\
             --threads ${task.cpus}
 
-    # Küme ataması
+    # Assign clusters
     poppunk_assign \\
             --db poppunk_output/db \\
             --query poppunk_input.txt \\
