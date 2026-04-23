@@ -17,9 +17,11 @@ include { CHECKM                } from './modules/025_checkm.nf'
 include { FASTANI               } from './modules/024_fastani.nf'
 include { MOBSUITE              } from './modules/013_mobsuite.nf'
 include { SPLIT_MOB_OUTPUT      } from './modules/031_split_mob_output.nf'
-include { BAKTA_FASTA           } from './modules/032_bakta_fasta.nf'
-include { PLANNOTATE            } from './modules/033_plannotate.nf'
-include { AMRFINDER             } from './modules/014_amrfinder.nf'
+include { BAKTA_FASTA as BAKTA_CHROMOSOME } from './modules/032_bakta_fasta.nf'
+include { BAKTA_FASTA as BAKTA_PLASMID   } from './modules/032_bakta_fasta.nf'
+include { PLANNOTATE                     } from './modules/033_plannotate.nf'
+include { AMRFINDER as AMRFINDER_CHROM  } from './modules/014_amrfinder.nf'
+include { AMRFINDER as AMRFINDER_PLASMID} from './modules/014_amrfinder.nf'
 include { MLST                  } from './modules/005_mlst.nf'
 include { CGMLST                } from './modules/006_cgmlst.nf'
 include { PLASMIDFINDER         } from './modules/017_plasmidfinder.nf'
@@ -164,15 +166,15 @@ workflow {
     PLASMIDFINDER(polished)
 
     // ── Annotation: chromosome and plasmid separately ─────────────────────────
-    BAKTA_FASTA(chrom_ch,   'chromosome')
-    BAKTA_FASTA(plasmid_ch, 'plasmid')
+    BAKTA_CHROMOSOME(chrom_ch,   'chromosome')
+    BAKTA_PLASMID(plasmid_ch, 'plasmid')
 
     // ── Plasmid-specific annotation ───────────────────────────────────────────
     PLANNOTATE(plasmid_ch)
 
     // ── AMR: chromosome and plasmid separately ────────────────────────────────
-    AMRFINDER(chrom_ch,   'chromosome')
-    AMRFINDER(plasmid_ch, 'plasmid')
+    AMRFINDER_CHROM(chrom_ch,   'chromosome')
+    AMRFINDER_PLASMID(plasmid_ch, 'plasmid')
 
     // ── Molecular typing (on full assembly) ───────────────────────────────────
     MLST(polished)
@@ -203,8 +205,7 @@ workflow {
 
     // Pan-genome (optional)
     if (params.run_pangenome) {
-        chrom_gff = BAKTA_FASTA.out
-            .filter { sid, label, dir -> label == 'chromosome' }
+        chrom_gff = BAKTA_CHROMOSOME.out
             .map    { sid, label, dir -> file("${dir}/${sid}_chromosome.gff3") }
             .collect()
         roary_out  = ROARY(chrom_gff)
