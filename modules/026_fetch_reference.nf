@@ -12,26 +12,41 @@ process FETCH_REFERENCE {
 
     script:
     """
-    echo "Downloading reference genome for Salmonella ${serovar} (${accession})..."
+    #!/usr/bin/env python3
+    import urllib.request, urllib.error, zipfile, shutil, os, sys, time
 
-    # Use NCBI Datasets REST API — no extra tools required beyond curl + unzip
-    curl -L --retry 5 --retry-delay 10 --max-time 300 \
-        "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/${accession}/download?include_annotation_type=GENOME_FASTA&filename=genome.zip" \
-        -o genome.zip
+    accession = "${accession}"
+    serovar   = "${serovar}"
+    out_fasta = f"reference_{serovar}.fna"
+    url = (f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/{accession}/download"
+           f"?include_annotation_type=GENOME_FASTA&filename=genome.zip")
 
-    unzip -o genome.zip
+    print(f"Downloading {serovar} reference genome ({accession}) from NCBI...")
 
-    # Merge all sequences into one FASTA
-    find ncbi_dataset/data/ -name "*.fna" | sort | xargs cat > reference_${serovar}.fna
+    for attempt in range(5):
+        try:
+            urllib.request.urlretrieve(url, "genome.zip")
+            break
+        except Exception as e:
+            if attempt == 4:
+                print(f"ERROR: Download failed after 5 attempts: {e}", file=sys.stderr)
+                sys.exit(1)
+            time.sleep(10)
 
-    rm -rf genome.zip ncbi_dataset/
+    with zipfile.ZipFile("genome.zip") as z:
+        with open(out_fasta, "wb") as out:
+            for name in sorted(z.namelist()):
+                if name.endswith(".fna"):
+                    with z.open(name) as f:
+                        shutil.copyfileobj(f, out)
 
-    if [ ! -s reference_${serovar}.fna ]; then
-        echo "ERROR: Download produced an empty file for ${accession}" >&2
-        exit 1
-    fi
+    os.remove("genome.zip")
 
-    n_seqs=\$(grep -c '^>' reference_${serovar}.fna)
-    echo "Reference ready: \${n_seqs} sequence(s) for ${serovar} (${accession})"
+    if not os.path.getsize(out_fasta):
+        print(f"ERROR: Empty FASTA for {accession}", file=sys.stderr)
+        sys.exit(1)
+
+    n = sum(1 for line in open(out_fasta) if line.startswith(">"))
+    print(f"Reference ready: {n} sequence(s) for {serovar} ({accession})")
     """
 }
