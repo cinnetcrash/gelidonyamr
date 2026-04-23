@@ -5,358 +5,342 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GelidonyAMR · Pipeline Dashboard</title>
 <style>
-/* ── Reset & Variables ───────────────────────────────────────────── */
+/* ── Variables ───────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #080b0d;
-  --bg-mid:    #0d1117;
-  --bg-panel:  #111820;
-  --bg-input:  #0a1018;
-  --border:    #1e3040;
-  --border-hi: #2a4a60;
-  --ph:        #00e676;
-  --ph-dim:    #004d26;
-  --ph-glow:   rgba(0,230,118,0.15);
-  --ph-glow2:  rgba(0,230,118,0.06);
-  --cyan:      #00bcd4;
-  --cyan-dim:  #003d47;
-  --amber:     #ffb300;
-  --red:       #f44336;
-  --red-dim:   #4a0e0e;
-  --text:      #b0c4d0;
-  --text-dim:  #4a6070;
-  --text-hi:   #d4eaf4;
-  --mono:      'Courier New', 'Lucida Console', monospace;
-  --scan-line: repeating-linear-gradient(
-    0deg, transparent, transparent 3px,
-    rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
-  );
+  --bg:         #f1f5f9;
+  --surface:    #ffffff;
+  --border:     #e2e8f0;
+  --border-hi:  #cbd5e1;
+  --accent:     #2563eb;
+  --accent-lt:  #eff6ff;
+  --accent-bd:  #bfdbfe;
+  --green:      #16a34a;
+  --green-lt:   #f0fdf4;
+  --green-bd:   #bbf7d0;
+  --amber:      #d97706;
+  --amber-lt:   #fffbeb;
+  --red:        #dc2626;
+  --red-lt:     #fef2f2;
+  --red-bd:     #fecaca;
+  --cyan:       #0891b2;
+  --cyan-lt:    #ecfeff;
+  --text:       #334155;
+  --text-dim:   #94a3b8;
+  --text-hi:    #0f172a;
+  --log-bg:     #0f172a;
+  --log-text:   #cbd5e1;
+  --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --radius: 8px;
+  --radius-sm: 5px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.10), 0 2px 4px rgba(0,0,0,.05);
 }
 
 html, body { height: 100%; background: var(--bg); color: var(--text);
-  font-family: var(--mono); font-size: 13px; line-height: 1.5; overflow: hidden; }
-
-body::after { content: ''; position: fixed; inset: 0;
-  background: var(--scan-line); pointer-events: none; z-index: 9999; opacity: 0.6; }
+  font-family: var(--sans); font-size: 13px; line-height: 1.5; overflow: hidden; }
 
 /* ── Layout ──────────────────────────────────────────────────────── */
-.app { display: grid; grid-template-rows: 56px 1fr;
-  grid-template-columns: 330px 1fr; height: 100vh; }
+.app { display: grid; grid-template-rows: 54px 1fr;
+  grid-template-columns: 320px 1fr; height: 100vh; }
 
 /* ── Header ──────────────────────────────────────────────────────── */
-header { grid-column: 1 / -1; display: flex; align-items: center; gap: 18px;
-  padding: 0 24px; background: var(--bg-mid); border-bottom: 1px solid var(--border);
-  position: relative; overflow: hidden; }
-header::before { content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, var(--ph-glow2) 0%, transparent 40%); pointer-events: none; }
+header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
+  padding: 0 20px; background: var(--surface); border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow); }
 
-.header-mark { display: flex; align-items: center; gap: 10px; }
-.header-mark .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ph);
-  box-shadow: 0 0 8px var(--ph), 0 0 20px var(--ph-glow);
-  animation: pulse-dot 2.4s ease-in-out infinite; }
-@keyframes pulse-dot {
-  0%,100% { opacity:1; box-shadow: 0 0 8px var(--ph), 0 0 20px var(--ph-glow); }
-  50%      { opacity:.6; box-shadow: 0 0 4px var(--ph); } }
+.header-logo { display: flex; align-items: center; gap: 9px; }
+.header-logo svg { flex-shrink: 0; }
+.header-title { font-size: 15px; font-weight: 700; color: var(--text-hi); letter-spacing: -.2px; }
+.header-sub { font-size: 12px; color: var(--text-dim); border-left: 1px solid var(--border);
+  padding-left: 14px; font-style: italic; }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.pipeline-dir { font-size: 11px; color: var(--text-dim); font-family: var(--mono);
+  max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: var(--bg); padding: 3px 8px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); }
 
-.header-title { font-size: 17px; font-weight: bold; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--ph);
-  text-shadow: 0 0 12px var(--ph-glow), 0 0 30px var(--ph-glow2); }
-.header-sub { font-size: 11px; color: var(--text-dim); letter-spacing: .04em;
-  border-left: 1px solid var(--border); padding-left: 18px; }
-.header-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
-.pipeline-dir { font-size: 10px; color: var(--text-dim); max-width: 260px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Status badge */
+.status-badge { display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  letter-spacing: .03em; transition: all .25s; border: 1px solid transparent; }
+.badge-led { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
-.status-badge { display: flex; align-items: center; gap: 7px; padding: 4px 14px;
-  border: 1px solid var(--border-hi); border-radius: 2px; font-size: 11px;
-  letter-spacing: .1em; text-transform: uppercase; font-weight: bold;
-  transition: all .3s; background: var(--bg); }
-.status-badge .badge-led { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-
-.status-badge[data-status="idle"]      { color:var(--text-dim); border-color:var(--border); }
-.status-badge[data-status="idle"] .badge-led { background:var(--text-dim); }
-.status-badge[data-status="running"]   { color:var(--cyan); border-color:var(--cyan-dim); background:rgba(0,188,212,.06); }
-.status-badge[data-status="running"] .badge-led { background:var(--cyan); animation:blink-led .8s step-end infinite; box-shadow:0 0 6px var(--cyan); }
-.status-badge[data-status="completed"] { color:var(--ph); border-color:var(--ph-dim); background:var(--ph-glow2); }
-.status-badge[data-status="completed"] .badge-led { background:var(--ph); box-shadow:0 0 6px var(--ph); }
-.status-badge[data-status="failed"]    { color:var(--red); border-color:var(--red-dim); background:rgba(244,67,54,.06); }
-.status-badge[data-status="failed"] .badge-led { background:var(--red); box-shadow:0 0 6px var(--red); }
-.status-badge[data-status="stopped"]   { color:var(--amber); border-color:#4a3800; background:rgba(255,179,0,.05); }
+.status-badge[data-status="idle"]      { background:#f8fafc; color:var(--text-dim); border-color:var(--border); }
+.status-badge[data-status="idle"] .badge-led { background:var(--border-hi); }
+.status-badge[data-status="running"]   { background:var(--cyan-lt); color:var(--cyan); border-color:#a5f3fc; }
+.status-badge[data-status="running"] .badge-led { background:var(--cyan); animation:blink .8s step-end infinite; }
+.status-badge[data-status="completed"] { background:var(--green-lt); color:var(--green); border-color:var(--green-bd); }
+.status-badge[data-status="completed"] .badge-led { background:var(--green); }
+.status-badge[data-status="failed"]    { background:var(--red-lt); color:var(--red); border-color:var(--red-bd); }
+.status-badge[data-status="failed"] .badge-led { background:var(--red); }
+.status-badge[data-status="stopped"]   { background:var(--amber-lt); color:var(--amber); border-color:#fde68a; }
 .status-badge[data-status="stopped"] .badge-led { background:var(--amber); }
-@keyframes blink-led { 0%,100%{opacity:1} 50%{opacity:.1} }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
 /* ── Sidebar ─────────────────────────────────────────────────────── */
-.sidebar { background:var(--bg-panel); border-right:1px solid var(--border);
-  overflow-y:auto; overflow-x:hidden; padding: 20px 0 40px; }
-.sidebar::-webkit-scrollbar { width:4px; }
-.sidebar::-webkit-scrollbar-thumb { background:var(--border-hi); border-radius:2px; }
+.sidebar { background: var(--surface); border-right: 1px solid var(--border);
+  overflow-y: auto; overflow-x: hidden; }
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 4px; }
 
-.section { padding: 0 16px 20px; border-bottom:1px solid var(--border); margin-bottom:4px; }
-.section:last-child { border-bottom:none; }
-.section-label { font-size:10px; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--ph); text-shadow:0 0 8px var(--ph-glow); margin-bottom:14px; margin-top:18px;
-  display:flex; align-items:center; gap:8px; }
-.section-label::before { content:'▸'; font-size:9px; }
+.section { padding: 16px; border-bottom: 1px solid var(--border); }
+.section:last-child { border-bottom: none; }
 
-.radio-group { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
-.radio-option { display:flex; align-items:center; gap:10px; cursor:pointer;
-  padding:7px 10px; border:1px solid transparent; border-radius:2px; transition:all .15s; }
-.radio-option:hover { border-color:var(--border-hi); background:rgba(255,255,255,.02); }
-.radio-option.active { border-color:var(--ph-dim); background:var(--ph-glow2); }
-.radio-option input[type="radio"] { display:none; }
-.radio-dot { width:14px; height:14px; border:1px solid var(--text-dim); border-radius:50%;
-  display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
-.radio-option.active .radio-dot { border-color:var(--ph); box-shadow:0 0 6px var(--ph-glow); }
-.radio-option.active .radio-dot::after { content:''; width:6px; height:6px; border-radius:50%;
-  background:var(--ph); box-shadow:0 0 4px var(--ph); }
-.radio-label { font-size:12px; color:var(--text); }
-.radio-option.active .radio-label { color:var(--ph); }
+.section-label { font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; }
+
+/* Radio options */
+.radio-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.radio-option { display: flex; align-items: center; gap: 9px; cursor: pointer;
+  padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  transition: all .12s; background: var(--bg); }
+.radio-option:hover { border-color: var(--accent-bd); background: var(--accent-lt); }
+.radio-option.active { border-color: var(--accent-bd); background: var(--accent-lt); }
+.radio-option input[type="radio"] { display: none; }
+.radio-dot { width: 14px; height: 14px; border: 1.5px solid var(--border-hi); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .12s; }
+.radio-option.active .radio-dot { border-color: var(--accent); }
+.radio-option.active .radio-dot::after { content: ''; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--accent); }
+.radio-label { font-size: 12px; color: var(--text); }
+.radio-option.active .radio-label { color: var(--accent); font-weight: 500; }
 
 /* Fields */
-.field { margin-bottom:10px; }
-.field-label { font-size:10px; letter-spacing:.08em; color:var(--text-dim);
-  text-transform:uppercase; margin-bottom:5px; display:block; }
-
-/* Input + browse button row */
-.field-row { display:flex; gap:5px; }
-.field-row input { flex:1; min-width:0; }
+.field { margin-bottom: 10px; }
+.field-label { font-size: 11px; font-weight: 500; color: var(--text-dim);
+  margin-bottom: 4px; display: block; }
+.field-row { display: flex; gap: 5px; }
+.field-row input { flex: 1; min-width: 0; }
 
 .field input[type="text"],
 .field input[type="number"],
 .field select,
 .field-row input[type="text"] {
-  width:100%; background:var(--bg-input); border:1px solid var(--border);
-  color:var(--text-hi); font-family:var(--mono); font-size:12px;
-  padding:7px 10px; border-radius:2px; outline:none;
-  transition:border-color .15s, box-shadow .15s; appearance:none; -webkit-appearance:none; }
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-hi); font-family: var(--mono); font-size: 11px;
+  padding: 7px 10px; border-radius: var(--radius-sm); outline: none;
+  transition: border-color .15s, box-shadow .15s; appearance: none; }
 .field input:focus, .field select:focus, .field-row input:focus {
-  border-color:var(--ph-dim);
-  box-shadow:0 0 0 2px var(--ph-glow2), inset 0 0 8px rgba(0,230,118,.04); }
+  border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
 .field select {
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234a6070'/%3E%3C/svg%3E");
-  background-repeat:no-repeat; background-position:right 10px center;
-  padding-right:28px; cursor:pointer; }
-.field select option { background:var(--bg-panel); color:var(--text); }
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2394a3b8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 28px; cursor: pointer; background-color: var(--surface); }
+.field select option { background: var(--surface); color: var(--text-hi); }
 
 /* Browse button */
-.btn-browse {
-  flex-shrink:0; padding:0 10px; background:var(--bg-input);
-  border:1px solid var(--border); color:var(--text-dim); cursor:pointer;
-  border-radius:2px; font-size:14px; line-height:1; transition:all .15s;
-  display:flex; align-items:center; justify-content:center; }
-.btn-browse:hover { border-color:var(--ph-dim); color:var(--ph); background:var(--ph-glow2); }
-.btn-browse:active { transform:scale(.95); }
+.btn-browse { flex-shrink: 0; padding: 0 10px; background: var(--bg);
+  border: 1px solid var(--border); color: var(--text-dim); cursor: pointer;
+  border-radius: var(--radius-sm); font-size: 13px; display: flex;
+  align-items: center; transition: all .12s; }
+.btn-browse:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
 
-.resource-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+/* Drag-and-drop zone */
+.drop-zone { border: 2px dashed var(--border-hi); border-radius: var(--radius);
+  padding: 18px 12px; text-align: center; cursor: pointer; transition: all .15s;
+  background: var(--bg); margin-bottom: 10px; }
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color: var(--accent); background: var(--accent-lt); }
+.drop-zone.drag-over { border-style: solid; }
+.drop-zone .dz-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+.drop-zone .dz-main { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.drop-zone .dz-sub  { font-size: 11px; color: var(--text-dim); }
+.drop-zone.has-value { border-color: var(--green-bd); background: var(--green-lt); }
+.drop-zone.has-value .dz-icon::before { content: '✓ '; font-size: 14px; }
+.drop-zone.has-value .dz-main { color: var(--green); }
+
+.resource-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.help-text { font-size: 10px; color: var(--text-dim); margin-top: 3px; }
 
 /* ── Log Panel ───────────────────────────────────────────────────── */
-.log-panel { display:flex; flex-direction:column; background:var(--bg); overflow:hidden; }
+.log-panel { display: flex; flex-direction: column; background: var(--log-bg); overflow: hidden; }
 
-.toolbar { display:flex; align-items:center; gap:10px; padding:10px 16px;
-  background:var(--bg-mid); border-bottom:1px solid var(--border); flex-shrink:0; }
+.toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  background: #1e293b; border-bottom: 1px solid #334155; flex-shrink: 0; }
 
-.btn { display:inline-flex; align-items:center; gap:6px; padding:6px 16px;
-  border:1px solid var(--border-hi); border-radius:2px; background:var(--bg-input);
-  color:var(--text); font-family:var(--mono); font-size:11px; letter-spacing:.08em;
-  text-transform:uppercase; cursor:pointer; transition:all .15s; font-weight:bold; white-space:nowrap; }
-.btn:hover { border-color:var(--text-dim); color:var(--text-hi); background:rgba(255,255,255,.04); }
-.btn:active { transform:translateY(1px); }
-.btn:disabled { opacity:.3; cursor:not-allowed; pointer-events:none; }
-.btn-run { border-color:var(--ph-dim); color:var(--ph); background:rgba(0,230,118,.05); }
-.btn-run:hover { background:rgba(0,230,118,.12); box-shadow:0 0 12px var(--ph-glow2); border-color:var(--ph); }
-.btn-run.running { color:var(--cyan); border-color:var(--cyan-dim); background:rgba(0,188,212,.06);
-  animation:running-glow 1.6s ease-in-out infinite; }
-@keyframes running-glow { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 16px rgba(0,188,212,.2)} }
-.btn-stop { border-color:var(--red-dim); color:var(--red); }
-.btn-stop:hover:not(:disabled) { background:rgba(244,67,54,.08); border-color:var(--red); }
-.btn-clear { border-color:var(--border); color:var(--text-dim); }
+.btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px;
+  border-radius: var(--radius-sm); font-family: var(--sans); font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: all .12s; border: 1px solid transparent;
+  white-space: nowrap; }
+.btn:disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
 
-.resume-wrap { display:flex; align-items:center; gap:7px; cursor:pointer;
-  padding:4px 10px; border:1px solid transparent; border-radius:2px;
-  transition:all .15s; user-select:none; }
-.resume-wrap:hover { border-color:var(--border); }
-.resume-wrap input { display:none; }
-.resume-box { width:14px; height:14px; border:1px solid var(--border-hi); border-radius:1px;
-  display:flex; align-items:center; justify-content:center; transition:all .15s; flex-shrink:0; }
-.resume-wrap.checked .resume-box { border-color:var(--amber); background:rgba(255,179,0,.12); }
-.resume-wrap.checked .resume-box::after { content:'✓'; font-size:10px; color:var(--amber); line-height:1; }
-.resume-text { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); }
-.resume-wrap.checked .resume-text { color:var(--amber); }
+.btn-run { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-run:hover:not(:disabled) { background: #1d4ed8; }
+.btn-run.running { background: var(--cyan); border-color: var(--cyan); animation: pulse-run 1.5s ease-in-out infinite; }
+@keyframes pulse-run { 0%,100%{opacity:1} 50%{opacity:.8} }
 
-.toolbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
-.log-counter { font-size:10px; color:var(--text-dim); letter-spacing:.06em; }
+.btn-stop { background: transparent; color: #f87171; border-color: #7f1d1d; }
+.btn-stop:hover:not(:disabled) { background: #7f1d1d; color: #fff; }
 
-.autoscroll-wrap { display:flex; align-items:center; gap:6px; cursor:pointer; font-size:10px;
-  color:var(--text-dim); letter-spacing:.06em; text-transform:uppercase; user-select:none; }
-.autoscroll-wrap input { display:none; }
-.autoscroll-tog { width:28px; height:14px; background:var(--border); border-radius:7px;
-  position:relative; transition:background .2s; }
-.autoscroll-tog::after { content:''; width:10px; height:10px; background:var(--text-dim);
-  border-radius:50%; position:absolute; top:2px; left:2px; transition:all .2s; }
-.autoscroll-wrap.on .autoscroll-tog { background:var(--ph-dim); }
-.autoscroll-wrap.on .autoscroll-tog::after { left:16px; background:var(--ph); box-shadow:0 0 4px var(--ph); }
-.autoscroll-wrap.on { color:var(--ph); }
+.btn-clear { background: transparent; color: #64748b; border-color: #334155; }
+.btn-clear:hover { color: var(--log-text); border-color: #475569; }
 
-.log-body { flex:1; overflow-y:auto; overflow-x:auto; padding:14px 18px 20px; position:relative; }
-.log-body::-webkit-scrollbar { width:5px; height:5px; }
-.log-body::-webkit-scrollbar-thumb { background:var(--border-hi); border-radius:2px; }
+.resume-wrap { display: flex; align-items: center; gap: 6px; cursor: pointer;
+  padding: 5px 10px; border: 1px solid #334155; border-radius: var(--radius-sm);
+  transition: all .12s; user-select: none; }
+.resume-wrap:hover { border-color: var(--amber); }
+.resume-wrap input { display: none; }
+.resume-box { width: 14px; height: 14px; border: 1.5px solid #475569; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.resume-wrap.checked .resume-box { border-color: var(--amber); background: rgba(217,119,6,.2); }
+.resume-wrap.checked .resume-box::after { content: '✓'; font-size: 10px; color: var(--amber); }
+.resume-text { font-size: 11px; color: #94a3b8; font-weight: 500; }
+.resume-wrap.checked .resume-text { color: var(--amber); }
 
-.log-empty { position:absolute; inset:0; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:14px; color:var(--text-dim);
-  pointer-events:none; transition:opacity .3s; }
-.log-empty.hidden { opacity:0; }
-.log-empty-art { font-size:11px; line-height:1.6; text-align:center;
-  color:var(--ph-dim); letter-spacing:.05em; opacity:.6; }
-.log-empty-msg { font-size:12px; letter-spacing:.08em; }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.log-counter { font-size: 11px; color: #475569; font-family: var(--mono); }
 
-.log-lines { font-size:12px; line-height:1.7; white-space:pre; color:var(--text); min-height:100%; }
-.log-line { display:block; }
-.log-line:hover { background:rgba(255,255,255,.02); }
-.log-line.err  { color:#ef9a9a; }
-.log-line.warn { color:#ffe082; }
-.log-line.ok   { color:#a5d6a7; }
-.log-line.info { color:#80deea; }
-.log-line.proc { color:#ce93d8; }
+.autoscroll-wrap { display: flex; align-items: center; gap: 6px; cursor: pointer;
+  font-size: 11px; color: #475569; user-select: none; }
+.autoscroll-wrap input { display: none; }
+.autoscroll-tog { width: 28px; height: 15px; background: #334155; border-radius: 8px;
+  position: relative; transition: background .2s; }
+.autoscroll-tog::after { content: ''; width: 11px; height: 11px; background: #64748b;
+  border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: all .2s; }
+.autoscroll-wrap.on .autoscroll-tog { background: var(--accent); }
+.autoscroll-wrap.on .autoscroll-tog::after { left: 15px; background: #fff; }
+.autoscroll-wrap.on { color: #93c5fd; }
 
-.log-cursor { display:inline-block; width:8px; height:13px; background:var(--ph);
-  opacity:.8; animation:blink-cursor 1s step-end infinite; vertical-align:middle;
-  box-shadow:0 0 6px var(--ph-glow); }
-@keyframes blink-cursor { 0%,100%{opacity:.8} 50%{opacity:0} }
+/* Log output */
+.log-body { flex: 1; overflow-y: auto; overflow-x: auto; padding: 14px 16px 20px; position: relative; }
+.log-body::-webkit-scrollbar { width: 5px; }
+.log-body::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
 
-.cmd-bar { padding:7px 18px; background:var(--bg-mid); border-top:1px solid var(--border);
-  font-size:10px; color:var(--text-dim); letter-spacing:.04em; flex-shrink:0;
-  display:flex; align-items:center; gap:8px; overflow:hidden; }
-.cmd-bar-label { color:var(--ph-dim); flex-shrink:0; font-weight:bold; }
-.cmd-bar-text  { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.log-empty { position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px; pointer-events: none; transition: opacity .3s; }
+.log-empty.hidden { opacity: 0; }
+.log-empty-icon { font-size: 36px; opacity: .2; }
+.log-empty-msg { font-size: 12px; color: #475569; font-family: var(--mono); }
+
+.log-lines { font-family: var(--mono); font-size: 12px; line-height: 1.7;
+  white-space: pre; color: var(--log-text); min-height: 100%; }
+.log-line { display: block; }
+.log-line:hover { background: rgba(255,255,255,.03); }
+.log-line.err  { color: #fca5a5; }
+.log-line.warn { color: #fde68a; }
+.log-line.ok   { color: #86efac; }
+.log-line.info { color: #67e8f9; }
+.log-line.proc { color: #d8b4fe; }
+
+.log-cursor { display: inline-block; width: 8px; height: 14px; background: #38bdf8;
+  opacity: .9; animation: cur 1s step-end infinite; vertical-align: middle; }
+@keyframes cur { 0%,100%{opacity:.9} 50%{opacity:0} }
+
+.cmd-bar { padding: 8px 16px; background: #0f172a; border-top: 1px solid #1e293b;
+  font-family: var(--mono); font-size: 10px; color: #475569; flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px; overflow: hidden; }
+.cmd-bar-label { color: #2563eb; flex-shrink: 0; font-weight: 700; }
+.cmd-bar-text  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ── File Browser Modal ───────────────────────────────────────────── */
-.browser-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.72);
-  z-index:500; display:flex; align-items:center; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity .18s; }
-.browser-overlay.open { opacity:1; pointer-events:all; }
+.browser-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.5);
+  z-index: 500; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .18s; }
+.browser-overlay.open { opacity: 1; pointer-events: all; }
 
-.browser-modal {
-  width:700px; max-width:95vw; height:520px; max-height:90vh;
-  background:var(--bg-panel); border:1px solid var(--border-hi);
-  border-radius:3px; display:flex; flex-direction:column; overflow:hidden;
-  transform:scale(.96) translateY(8px); transition:transform .18s; }
-.browser-overlay.open .browser-modal { transform:scale(1) translateY(0); }
+.browser-modal { width: 680px; max-width: 95vw; height: 520px; max-height: 90vh;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-md); display: flex; flex-direction: column; overflow: hidden;
+  transform: scale(.97) translateY(6px); transition: transform .18s; }
+.browser-overlay.open .browser-modal { transform: scale(1) translateY(0); }
 
-/* Modal header */
-.browser-header {
-  display:flex; align-items:center; gap:10px;
-  padding:12px 16px; background:var(--bg-mid); border-bottom:1px solid var(--border);
-  flex-shrink:0; }
-.browser-title { font-size:11px; letter-spacing:.12em; text-transform:uppercase;
-  color:var(--ph); font-weight:bold; flex-shrink:0; }
-.browser-close {
-  margin-left:auto; width:24px; height:24px; border:none; background:none;
-  color:var(--text-dim); cursor:pointer; font-size:16px; border-radius:2px;
-  display:flex; align-items:center; justify-content:center; transition:all .15s; }
-.browser-close:hover { color:var(--red); background:rgba(244,67,54,.1); }
+.browser-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.browser-title { font-size: 13px; font-weight: 700; color: var(--text-hi); flex: 1; }
+.browser-close { width: 26px; height: 26px; border: none; background: none; color: var(--text-dim);
+  cursor: pointer; border-radius: var(--radius-sm); font-size: 14px; display: flex;
+  align-items: center; justify-content: center; transition: all .12s; }
+.browser-close:hover { background: var(--red-lt); color: var(--red); }
 
-/* Breadcrumb */
-.browser-breadcrumb {
-  display:flex; align-items:center; flex-wrap:wrap; gap:2px;
-  padding:8px 16px; background:var(--bg-input); border-bottom:1px solid var(--border);
-  font-size:11px; color:var(--text-dim); flex-shrink:0; min-height:36px; }
-.crumb { cursor:pointer; padding:2px 5px; border-radius:2px; transition:all .12s;
-  color:var(--text-dim); white-space:nowrap; }
-.crumb:hover { color:var(--ph); background:var(--ph-glow2); }
-.crumb-sep { color:var(--border-hi); user-select:none; }
-.crumb:last-child { color:var(--text-hi); cursor:default; }
-.crumb:last-child:hover { background:none; color:var(--text-hi); }
+.browser-breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 2px;
+  padding: 8px 16px; background: var(--bg); border-bottom: 1px solid var(--border);
+  font-size: 11px; flex-shrink: 0; min-height: 36px; font-family: var(--mono); }
+.crumb { cursor: pointer; padding: 2px 6px; border-radius: 4px; color: var(--text-dim); white-space: nowrap; }
+.crumb:hover { color: var(--accent); background: var(--accent-lt); }
+.crumb-sep { color: var(--border-hi); user-select: none; }
+.crumb:last-child { color: var(--text-hi); cursor: default; font-weight: 600; }
+.crumb:last-child:hover { background: none; }
 
-/* Filter bar */
-.browser-filter {
-  display:flex; align-items:center; gap:8px;
-  padding:7px 16px; border-bottom:1px solid var(--border);
-  flex-shrink:0; }
-.browser-search {
-  flex:1; background:var(--bg-input); border:1px solid var(--border);
-  color:var(--text-hi); font-family:var(--mono); font-size:11px;
-  padding:5px 10px; border-radius:2px; outline:none; transition:border-color .15s; }
-.browser-search:focus { border-color:var(--ph-dim); }
-.browser-search::placeholder { color:var(--text-dim); }
-.browser-hidden-wrap {
-  display:flex; align-items:center; gap:5px; font-size:10px;
-  color:var(--text-dim); cursor:pointer; user-select:none; white-space:nowrap; }
-.browser-hidden-wrap input { display:none; }
-.hidden-box { width:13px; height:13px; border:1px solid var(--border-hi);
-  border-radius:1px; display:flex; align-items:center; justify-content:center; }
-.browser-hidden-wrap.on .hidden-box { border-color:var(--cyan); background:rgba(0,188,212,.1); }
-.browser-hidden-wrap.on .hidden-box::after { content:'✓'; font-size:9px; color:var(--cyan); }
-.browser-hidden-wrap.on { color:var(--cyan); }
+.browser-filter { display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.browser-search { flex: 1; background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-hi); font-family: var(--sans); font-size: 12px; padding: 6px 10px;
+  border-radius: var(--radius-sm); outline: none; transition: border-color .12s; }
+.browser-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+.browser-search::placeholder { color: var(--text-dim); }
 
-/* File list */
-.browser-list {
-  flex:1; overflow-y:auto; padding:6px 0; }
-.browser-list::-webkit-scrollbar { width:4px; }
-.browser-list::-webkit-scrollbar-thumb { background:var(--border-hi); border-radius:2px; }
+.browser-hidden-wrap { display: flex; align-items: center; gap: 5px; font-size: 11px;
+  color: var(--text-dim); cursor: pointer; user-select: none; white-space: nowrap; }
+.browser-hidden-wrap input { display: none; }
+.hidden-box { width: 14px; height: 14px; border: 1.5px solid var(--border-hi); border-radius: 3px;
+  display: flex; align-items: center; justify-content: center; transition: all .12s; }
+.browser-hidden-wrap.on .hidden-box { border-color: var(--accent); background: var(--accent-lt); }
+.browser-hidden-wrap.on .hidden-box::after { content: '✓'; font-size: 9px; color: var(--accent); font-weight: 700; }
+.browser-hidden-wrap.on { color: var(--accent); }
 
-.browser-entry {
-  display:flex; align-items:center; gap:10px; padding:7px 16px;
-  cursor:pointer; transition:background .1s; font-size:12px; }
-.browser-entry:hover { background:rgba(255,255,255,.04); }
-.browser-entry.dir  { color:var(--cyan); }
-.browser-entry.file { color:var(--text); }
-.browser-entry.file:hover { color:var(--text-hi); }
-.browser-entry .entry-icon { font-size:13px; flex-shrink:0; width:18px; text-align:center; }
-.browser-entry .entry-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.browser-entry.dir .entry-name { font-weight:bold; }
+.browser-list { flex: 1; overflow-y: auto; }
+.browser-list::-webkit-scrollbar { width: 4px; }
+.browser-list::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
 
-.browser-up { color:var(--amber) !important; }
-.browser-empty { padding:40px 16px; text-align:center;
-  font-size:11px; color:var(--text-dim); letter-spacing:.06em; }
+.browser-entry { display: flex; align-items: center; gap: 10px; padding: 8px 16px;
+  cursor: pointer; transition: background .1s; font-size: 12px; }
+.browser-entry:hover { background: var(--bg); }
+.browser-entry.dir  { color: var(--accent); }
+.browser-entry.file { color: var(--text); }
+.browser-entry .entry-icon { font-size: 14px; flex-shrink: 0; width: 20px; text-align: center; }
+.browser-entry .entry-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.browser-entry.dir .entry-name { font-weight: 500; }
+.browser-entry.selected { background: var(--accent-lt); }
+.browser-up { color: var(--amber) !important; }
+.browser-empty { padding: 40px; text-align: center; font-size: 12px; color: var(--text-dim); }
 
-/* Modal footer */
-.browser-footer {
-  display:flex; align-items:center; gap:10px;
-  padding:10px 16px; background:var(--bg-mid); border-top:1px solid var(--border);
-  flex-shrink:0; }
-.browser-selected {
-  flex:1; font-size:11px; color:var(--text-dim); overflow:hidden;
-  text-overflow:ellipsis; white-space:nowrap; }
-.browser-selected span { color:var(--ph); }
-.btn-browser-cancel { padding:5px 14px; border:1px solid var(--border);
-  background:var(--bg-input); color:var(--text-dim); font-family:var(--mono);
-  font-size:11px; cursor:pointer; border-radius:2px; transition:all .15s; letter-spacing:.06em; }
-.btn-browser-cancel:hover { border-color:var(--border-hi); color:var(--text); }
-.btn-browser-select { padding:5px 16px; border:1px solid var(--ph-dim);
-  background:rgba(0,230,118,.06); color:var(--ph); font-family:var(--mono);
-  font-size:11px; cursor:pointer; border-radius:2px; transition:all .15s;
-  font-weight:bold; letter-spacing:.08em; text-transform:uppercase; }
-.btn-browser-select:hover { background:rgba(0,230,118,.14); border-color:var(--ph); }
-.btn-browser-select:disabled { opacity:.3; cursor:not-allowed; }
+.browser-footer { display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+  border-top: 1px solid var(--border); flex-shrink: 0; background: var(--bg); }
+.browser-selected { flex: 1; font-size: 11px; color: var(--text-dim); font-family: var(--mono);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.browser-selected span { color: var(--accent); font-weight: 600; }
+
+.btn-browser-cancel { padding: 6px 14px; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm);
+  transition: all .12s; font-family: var(--sans); }
+.btn-browser-cancel:hover { border-color: var(--border-hi); }
+.btn-browser-select { padding: 6px 16px; border: 1px solid var(--accent); background: var(--accent);
+  color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm);
+  transition: all .12s; font-family: var(--sans); }
+.btn-browser-select:hover { background: #1d4ed8; }
+.btn-browser-select:disabled { opacity: .4; cursor: not-allowed; }
 
 /* ── Toast ───────────────────────────────────────────────────────── */
-.toast { position:fixed; bottom:24px; right:24px; padding:10px 18px;
-  background:var(--bg-panel); border:1px solid var(--border-hi); border-radius:2px;
-  font-size:12px; color:var(--text-hi); z-index:1000; transform:translateY(8px);
-  opacity:0; transition:all .2s; pointer-events:none; max-width:360px; }
-.toast.show { transform:translateY(0); opacity:1; }
-.toast.error   { border-color:var(--red-dim); color:var(--red); }
-.toast.success { border-color:var(--ph-dim);  color:var(--ph); }
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 16px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 12px; color: var(--text-hi); box-shadow: var(--shadow-md); z-index: 1000;
+  transform: translateY(8px); opacity: 0; transition: all .2s; pointer-events: none; max-width: 340px; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.error   { border-color: var(--red-bd);   color: var(--red); }
+.toast.success { border-color: var(--green-bd);  color: var(--green); }
 </style>
 </head>
 <body>
-
 <div class="app">
 
   <!-- ── Header ── -->
   <header>
-    <div class="header-mark">
-      <div class="dot"></div>
+    <div class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="#2563eb"/>
+        <path d="M7 14h14M14 7l7 7-7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
       <span class="header-title">GelidonyAMR</span>
     </div>
-    <span class="header-sub"><em>Salmonella</em> · Genomic Epidemiology Pipeline</span>
+    <span class="header-sub">Salmonella · Genomic Epidemiology Pipeline</span>
     <div class="header-right">
       <span class="pipeline-dir" title="{{ pipeline_dir }}">{{ pipeline_dir }}</span>
       <div class="status-badge" id="statusBadge" data-status="idle">
         <div class="badge-led"></div>
-        <span id="statusText">IDLE</span>
+        <span id="statusText">Idle</span>
       </div>
     </div>
   </header>
@@ -364,11 +348,10 @@ header::before { content: ''; position: absolute; inset: 0;
   <!-- ── Sidebar ── -->
   <aside class="sidebar">
 
-    <!-- Platform + Input -->
+    <!-- Platform -->
     <div class="section">
-      <div class="section-label">Platform</div>
-
-      <div class="radio-group" id="platformGroup">
+      <div class="section-label">Sequencing Platform</div>
+      <div class="radio-group">
         <label class="radio-option active" id="radioPlatformONT">
           <input type="radio" name="platform" value="ont" checked>
           <div class="radio-dot"></div>
@@ -377,7 +360,7 @@ header::before { content: ''; position: absolute; inset: 0;
         <label class="radio-option" id="radioPlatformILL">
           <input type="radio" name="platform" value="illumina">
           <div class="radio-dot"></div>
-          <span class="radio-label">Illumina (paired-end)</span>
+          <span class="radio-label">Illumina — paired-end</span>
         </label>
       </div>
     </div>
@@ -390,7 +373,7 @@ header::before { content: ''; position: absolute; inset: 0;
         <label class="radio-option active" id="radioBarcode">
           <input type="radio" name="ontMode" value="barcode" checked>
           <div class="radio-dot"></div>
-          <span class="radio-label">Barcode klasörleri (Guppy/MinKNOW)</span>
+          <span class="radio-label">Barcode klasörleri (Guppy / MinKNOW)</span>
         </label>
         <label class="radio-option" id="radioLocal">
           <input type="radio" name="ontMode" value="local">
@@ -404,41 +387,62 @@ header::before { content: ''; position: absolute; inset: 0;
         </label>
       </div>
 
-      <!-- Barcode dir -->
-      <div class="field" id="barcodeField">
-        <span class="field-label">Barcode ana klasörü (fastq_pass/)</span>
-        <div class="field-row">
-          <input type="text" id="barcodeDirInput" placeholder="/path/to/fastq_pass">
-          <button class="btn-browse" title="Browse folder"
-            onclick="openBrowser('barcodeDirInput','dir','','')">📁</button>
+      <!-- Barcode drag-and-drop -->
+      <div id="barcodeField">
+        <div class="drop-zone" id="barcodeDrop"
+          ondragover="dzOver(event,'barcodeDrop')"
+          ondragleave="dzLeave('barcodeDrop')"
+          ondrop="dzDrop(event,'barcodeDirInput','barcodeDrop','dir')">
+          <span class="dz-icon">📁</span>
+          <div class="dz-main" id="barcodeDropLabel">Barcode klasörünü buraya sürükleyin</div>
+          <div class="dz-sub">veya aşağıdan seçin</div>
         </div>
-        <div class="field" style="margin-top:8px;">
-          <span class="field-label">Sample sheet (isteğe bağlı — barcode → isim)</span>
+        <div class="field">
+          <span class="field-label">fastq_pass/ klasör yolu</span>
           <div class="field-row">
-            <input type="text" id="sampleSheetInput" placeholder="barcode01&#9;Izolat_A">
-            <button class="btn-browse" title="Browse file"
-              onclick="openBrowser('sampleSheetInput','file','.tsv,.txt','')">📄</button>
+            <input type="text" id="barcodeDirInput" placeholder="/path/to/fastq_pass"
+              oninput="dzSync('barcodeDirInput','barcodeDrop','barcodeDropLabel')">
+            <button class="btn-browse" onclick="openBrowser('barcodeDirInput','dir','','')">📁</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">Sample sheet (opsiyonel — barcode&nbsp;→&nbsp;isim)</span>
+          <div class="field-row">
+            <input type="text" id="sampleSheetInput" placeholder="barcode01&#9;İzolat_A">
+            <button class="btn-browse" onclick="openBrowser('sampleSheetInput','file','.tsv,.txt','')">📄</button>
+          </div>
+          <div class="help-text">Verilmezse barcode isimleri (barcode01 vb.) kullanılır.</div>
+        </div>
+      </div>
+
+      <!-- Local FASTQ drag-and-drop -->
+      <div id="readsField" style="display:none;">
+        <div class="drop-zone" id="readsDrop"
+          ondragover="dzOver(event,'readsDrop')"
+          ondragleave="dzLeave('readsDrop')"
+          ondrop="dzDrop(event,'readsInput','readsDrop','dir')">
+          <span class="dz-icon">🧬</span>
+          <div class="dz-main" id="readsDropLabel">FASTQ klasörünü buraya sürükleyin</div>
+          <div class="dz-sub">veya aşağıdan seçin</div>
+        </div>
+        <div class="field">
+          <span class="field-label">FASTQ glob deseni</span>
+          <div class="field-row">
+            <input type="text" id="readsInput" value="input_folder/*.fastq" placeholder="input_folder/*.fastq"
+              oninput="dzSync('readsInput','readsDrop','readsDropLabel')">
+            <button class="btn-browse" onclick="openBrowser('readsInput','dir','','/*.fastq')">📁</button>
           </div>
         </div>
       </div>
 
-      <!-- Local FASTQ -->
-      <div class="field" id="readsField" style="display:none;">
-        <span class="field-label">FASTQ glob pattern</span>
-        <div class="field-row">
-          <input type="text" id="readsInput" value="input_folder/*.fastq" placeholder="input_folder/*.fastq">
-          <button class="btn-browse" title="Browse folder"
-            onclick="openBrowser('readsInput','dir','','/*.fastq')">📁</button>
-        </div>
-      </div>
-
       <!-- SRA -->
-      <div class="field" id="sraField" style="display:none;">
-        <span class="field-label">Accession listesi (.txt)</span>
-        <div class="field-row">
-          <input type="text" id="sraInput" placeholder="/path/to/accessions.txt">
-          <button class="btn-browse" title="Browse file"
-            onclick="openBrowser('sraInput','file','.txt','')">📄</button>
+      <div id="sraField" style="display:none;">
+        <div class="field">
+          <span class="field-label">Accession listesi (.txt)</span>
+          <div class="field-row">
+            <input type="text" id="sraInput" placeholder="/path/to/accessions.txt">
+            <button class="btn-browse" onclick="openBrowser('sraInput','file','.txt','')">📄</button>
+          </div>
         </div>
       </div>
     </div>
@@ -447,22 +451,18 @@ header::before { content: ''; position: absolute; inset: 0;
     <div class="section" id="illuminaSection" style="display:none;">
       <div class="section-label">Illumina Input</div>
       <div class="field">
-        <span class="field-label">R1 dosya deseni (R2 otomatik eşleştirilir)</span>
+        <span class="field-label">R1 dosya deseni</span>
         <div class="field-row">
           <input type="text" id="illuminaReadsInput" placeholder="data/*_R1.fastq.gz">
-          <button class="btn-browse" title="Browse folder"
-            onclick="openBrowser('illuminaReadsInput','dir','','/*_R1.fastq.gz')">📁</button>
+          <button class="btn-browse" onclick="openBrowser('illuminaReadsInput','dir','','/*_R1.fastq.gz')">📁</button>
         </div>
-        <span style="font-size:10px;color:var(--text-dim);display:block;margin-top:4px;">
-          Örnek: data/*_R1.fastq.gz → R2: data/*_R2.fastq.gz otomatik
-        </span>
+        <div class="help-text">R2 dosyaları otomatik eşleştirilir.</div>
       </div>
     </div>
 
     <!-- Serovar & Reference -->
     <div class="section">
       <div class="section-label">Serovar &amp; Reference</div>
-
       <div class="field">
         <span class="field-label">Salmonella serovar</span>
         <select id="serovarSelect">
@@ -483,18 +483,15 @@ header::before { content: ''; position: absolute; inset: 0;
           <option value="Paratyphi_B">Paratyphi B</option>
         </select>
       </div>
-
       <div class="field">
-        <span class="field-label">Reference genome (yerel dosya — boş bırakırsan otomatik indirilir)</span>
+        <span class="field-label">Referans genom (boş bırakılırsa otomatik indirilir)</span>
         <div class="field-row">
-          <input type="text" id="refInput" placeholder="Leave empty to auto-download">
-          <button class="btn-browse" title="Browse file"
-            onclick="openBrowser('refInput','file','.fna,.fa,.fasta','')">📄</button>
+          <input type="text" id="refInput" placeholder="Boş bırakın — NCBI'dan indirilir">
+          <button class="btn-browse" onclick="openBrowser('refInput','file','.fna,.fa,.fasta','')">📄</button>
         </div>
       </div>
-
       <div class="field">
-        <span class="field-label">Genome size hint</span>
+        <span class="field-label">Genom boyutu tahmini</span>
         <input type="text" id="genomeSizeInput" value="5m" placeholder="5m">
       </div>
     </div>
@@ -503,11 +500,10 @@ header::before { content: ''; position: absolute; inset: 0;
     <div class="section">
       <div class="section-label">Output</div>
       <div class="field">
-        <span class="field-label">Output directory</span>
+        <span class="field-label">Çıktı klasörü</span>
         <div class="field-row">
           <input type="text" id="outdirInput" value="Results" placeholder="Results">
-          <button class="btn-browse" title="Browse folder"
-            onclick="openBrowser('outdirInput','dir','','')">📁</button>
+          <button class="btn-browse" onclick="openBrowser('outdirInput','dir','','')">📁</button>
         </div>
       </div>
     </div>
@@ -516,12 +512,12 @@ header::before { content: ''; position: absolute; inset: 0;
     <div class="section">
       <div class="section-label">Profile</div>
       <div class="field">
-        <span class="field-label">Execution environment</span>
+        <span class="field-label">Çalışma ortamı</span>
         <select id="profileSelect">
           <option value="conda">conda</option>
           <option value="docker">docker</option>
           <option value="singularity">singularity</option>
-          <option value="standard">standard (tools in PATH)</option>
+          <option value="standard">standard (PATH'te kurulu araçlar)</option>
         </select>
       </div>
     </div>
@@ -531,16 +527,16 @@ header::before { content: ''; position: absolute; inset: 0;
       <div class="section-label">Resources</div>
       <div class="resource-row">
         <div class="field">
-          <span class="field-label">Max CPUs</span>
+          <span class="field-label">Max CPU</span>
           <input type="number" id="cpuInput" value="14" min="1" max="128">
         </div>
         <div class="field">
-          <span class="field-label">Max memory</span>
+          <span class="field-label">Max bellek</span>
           <input type="text" id="memInput" value="14GB" placeholder="14GB">
         </div>
       </div>
       <div class="field">
-        <span class="field-label">Max time</span>
+        <span class="field-label">Max süre</span>
         <input type="text" id="timeInput" value="24h" placeholder="24h">
       </div>
     </div>
@@ -548,46 +544,37 @@ header::before { content: ''; position: absolute; inset: 0;
     <!-- Databases -->
     <div class="section">
       <div class="section-label">Databases</div>
-
       <div class="field">
-        <span class="field-label">Kraken2 database</span>
+        <span class="field-label">Kraken2 veritabanı</span>
         <div class="field-row">
-          <input type="text" id="kraken2Input" value="/home/analysis/kraken2_db" placeholder="/path/to/kraken2_db">
-          <button class="btn-browse" title="Browse folder"
-            onclick="openBrowser('kraken2Input','dir','','')">📁</button>
+          <input type="text" id="kraken2Input" value="/home/analysis/kraken2_db">
+          <button class="btn-browse" onclick="openBrowser('kraken2Input','dir','','')">📁</button>
         </div>
       </div>
-
       <div class="field">
-        <span class="field-label">Clair3 model path</span>
+        <span class="field-label">Clair3 model klasörü</span>
         <div class="field-row">
-          <input type="text" id="clair3Input" value="/opt/models/r941_prom_hac_g360+g422" placeholder="/opt/models/...">
-          <button class="btn-browse" title="Browse folder"
-            onclick="openBrowser('clair3Input','dir','','')">📁</button>
+          <input type="text" id="clair3Input" value="/opt/models/r941_prom_hac_g360+g422">
+          <button class="btn-browse" onclick="openBrowser('clair3Input','dir','','')">📁</button>
         </div>
       </div>
-
       <div class="field">
-        <span class="field-label">Bakta database</span>
+        <span class="field-label">Bakta veritabanı</span>
         <div class="field-row">
-          <input type="text" id="baktaInput" value="/home/analysis/bakta_db" placeholder="/path/to/bakta_db">
-          <button class="btn-browse" title="Browse folder"
-            onclick="openBrowser('baktaInput','dir','','')">📁</button>
+          <input type="text" id="baktaInput" value="/home/analysis/bakta_db">
+          <button class="btn-browse" onclick="openBrowser('baktaInput','dir','','')">📁</button>
         </div>
       </div>
-
       <div class="field">
-        <span class="field-label">PlasmidFinder database</span>
+        <span class="field-label">PlasmidFinder veritabanı</span>
         <div class="field-row">
-          <input type="text" id="plasmidInput" value="/home/analysis/plasmidfinder_db" placeholder="/path/to/plasmidfinder_db">
-          <button class="btn-browse" title="Browse folder"
-            onclick="openBrowser('plasmidInput','dir','','')">📁</button>
+          <input type="text" id="plasmidInput" value="/home/analysis/plasmidfinder_db">
+          <button class="btn-browse" onclick="openBrowser('plasmidInput','dir','','')">📁</button>
         </div>
       </div>
-
       <div class="field">
-        <span class="field-label">snpEff database name</span>
-        <input type="text" id="snpeffInput" placeholder="Salmonella_enterica (auto)">
+        <span class="field-label">snpEff veritabanı adı</span>
+        <input type="text" id="snpeffInput" placeholder="Salmonella_enterica (otomatik)">
       </div>
     </div>
 
@@ -598,14 +585,12 @@ header::before { content: ''; position: absolute; inset: 0;
     <div class="toolbar">
       <button class="btn btn-run" id="runBtn">▶ Run</button>
       <button class="btn btn-stop" id="stopBtn" disabled>■ Stop</button>
-      <button class="btn btn-clear" id="clearBtn">✕ Clear</button>
-
+      <button class="btn btn-clear" id="clearBtn">Clear</button>
       <label class="resume-wrap" id="resumeWrap">
         <input type="checkbox" id="resumeCheck">
         <div class="resume-box"></div>
         <span class="resume-text">-resume</span>
       </label>
-
       <div class="toolbar-right">
         <span class="log-counter" id="lineCounter">0 lines</span>
         <label class="autoscroll-wrap on" id="autoscrollWrap">
@@ -618,13 +603,8 @@ header::before { content: ''; position: absolute; inset: 0;
 
     <div class="log-body" id="logBody">
       <div class="log-empty" id="logEmpty">
-        <div class="log-empty-art">
-╔══════════════════════════════╗<br>
-║  G E L I D O N Y A M R       ║<br>
-║  Nextflow · DSL2             ║<br>
-╚══════════════════════════════╝
-        </div>
-        <span class="log-empty-msg">Configure parameters → press Run</span>
+        <div class="log-empty-icon">🧬</div>
+        <div class="log-empty-msg">Parametreleri ayarlayın → Run</div>
       </div>
       <div class="log-lines" id="logLines"></div>
     </div>
@@ -634,49 +614,38 @@ header::before { content: ''; position: absolute; inset: 0;
       <span class="cmd-bar-text" id="cmdBar">—</span>
     </div>
   </section>
-
 </div><!-- .app -->
 
-<!-- ── File Browser Modal ── -->
+<!-- File Browser Modal -->
 <div class="browser-overlay" id="browserOverlay">
   <div class="browser-modal">
-
     <div class="browser-header">
       <span class="browser-title" id="browserTitle">Browse</span>
       <button class="browser-close" onclick="closeBrowser()">✕</button>
     </div>
-
     <div class="browser-breadcrumb" id="browserBreadcrumb"></div>
-
     <div class="browser-filter">
-      <input class="browser-search" id="browserSearch" type="text" placeholder="Filter entries…">
+      <input class="browser-search" id="browserSearch" type="text" placeholder="Filtrele…">
       <label class="browser-hidden-wrap" id="hiddenWrap">
         <input type="checkbox" id="hiddenCheck">
         <div class="hidden-box"></div>
-        Show hidden
+        Gizli dosyalar
       </label>
     </div>
-
     <div class="browser-list" id="browserList"></div>
-
     <div class="browser-footer">
-      <span class="browser-selected">Selected: <span id="browserSelectedPath">—</span></span>
-      <button class="btn-browser-cancel" onclick="closeBrowser()">Cancel</button>
-      <button class="btn-browser-select" id="browserSelectBtn" onclick="confirmSelection()">Select</button>
+      <span class="browser-selected">Seçili: <span id="browserSelectedPath">—</span></span>
+      <button class="btn-browser-cancel" onclick="closeBrowser()">İptal</button>
+      <button class="btn-browser-select" id="browserSelectBtn" onclick="confirmSelection()">Seç</button>
     </div>
-
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Pipeline state ────────────────────────────────────────────────────
-let es          = null;
-let localLines  = 0;
-let autoScroll  = true;
-let polling     = null;
+// ── State ─────────────────────────────────────────────────────────────
+let es = null, localLines = 0, autoScroll = true, polling = null;
 
 // ── DOM ───────────────────────────────────────────────────────────────
 const runBtn          = document.getElementById('runBtn');
@@ -695,37 +664,29 @@ const autoscrollWrap  = document.getElementById('autoscrollWrap');
 const autoscrollCheck = document.getElementById('autoscrollCheck');
 
 // ── Platform toggle ────────────────────────────────────────────────────
-function setPlatform(val) {
-  const isONT = val === 'ont';
-  document.getElementById('ontSection').style.display       = isONT ? '' : 'none';
-  document.getElementById('illuminaSection').style.display  = isONT ? 'none' : '';
-  document.getElementById('radioPlatformONT').classList.toggle('active', isONT);
-  document.getElementById('radioPlatformILL').classList.toggle('active', !isONT);
+function setPlatform(v) {
+  const ont = v === 'ont';
+  document.getElementById('ontSection').style.display      = ont ? '' : 'none';
+  document.getElementById('illuminaSection').style.display = ont ? 'none' : '';
+  document.getElementById('radioPlatformONT').classList.toggle('active', ont);
+  document.getElementById('radioPlatformILL').classList.toggle('active', !ont);
 }
-document.querySelectorAll('input[name="platform"]').forEach(r =>
-  r.addEventListener('change', () => setPlatform(r.value)));
+document.querySelectorAll('input[name="platform"]').forEach(r => r.addEventListener('change', () => setPlatform(r.value)));
 
-// ── ONT input mode toggle ─────────────────────────────────────────────
-function setOntMode(val) {
-  document.getElementById('barcodeField').style.display = val === 'barcode' ? '' : 'none';
-  document.getElementById('readsField').style.display   = val === 'local'   ? '' : 'none';
-  document.getElementById('sraField').style.display     = val === 'sra'     ? '' : 'none';
-  ['radioBarcode','radioLocal','radioSRA'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('active');
-  });
-  const modeMap = { barcode:'radioBarcode', local:'radioLocal', sra:'radioSRA' };
-  const label = document.getElementById(modeMap[val]);
-  if (label) label.classList.add('active');
+// ── ONT mode toggle ────────────────────────────────────────────────────
+function setOntMode(v) {
+  document.getElementById('barcodeField').style.display = v === 'barcode' ? '' : 'none';
+  document.getElementById('readsField').style.display   = v === 'local'   ? '' : 'none';
+  document.getElementById('sraField').style.display     = v === 'sra'     ? '' : 'none';
+  ['radioBarcode','radioLocal','radioSRA'].forEach(id => document.getElementById(id).classList.remove('active'));
+  ({ barcode:'radioBarcode', local:'radioLocal', sra:'radioSRA' })[v] &&
+    document.getElementById(({ barcode:'radioBarcode', local:'radioLocal', sra:'radioSRA' })[v]).classList.add('active');
 }
-document.querySelectorAll('input[name="ontMode"]').forEach(r =>
-  r.addEventListener('change', () => setOntMode(r.value)));
-
-// Click on radio-option labels
+document.querySelectorAll('input[name="ontMode"]').forEach(r => r.addEventListener('change', () => setOntMode(r.value)));
 document.querySelectorAll('.radio-option').forEach(opt =>
   opt.addEventListener('click', () => opt.querySelector('input[type="radio"]').click()));
 
-// ── Resume / autoscroll toggles ───────────────────────────────────────
+// ── Resume / autoscroll ────────────────────────────────────────────────
 resumeWrap.addEventListener('click', () => {
   resumeCheck.checked = !resumeCheck.checked;
   resumeWrap.classList.toggle('checked', resumeCheck.checked);
@@ -736,15 +697,12 @@ autoscrollWrap.addEventListener('click', () => {
   autoscrollWrap.classList.toggle('on', autoScroll);
 });
 logBody.addEventListener('scroll', () => {
-  const atBottom = logBody.scrollHeight - logBody.scrollTop - logBody.clientHeight < 40;
-  if (!atBottom && autoScroll) {
-    autoScroll = false;
-    autoscrollCheck.checked = false;
-    autoscrollWrap.classList.remove('on');
+  if (logBody.scrollHeight - logBody.scrollTop - logBody.clientHeight > 40 && autoScroll) {
+    autoScroll = false; autoscrollCheck.checked = false; autoscrollWrap.classList.remove('on');
   }
 });
 
-// ── Log rendering ─────────────────────────────────────────────────────
+// ── Log rendering ──────────────────────────────────────────────────────
 function classifyLine(t) {
   t = t.toLowerCase();
   if (/error|exception|failed|fatal/.test(t)) return 'err';
@@ -756,11 +714,10 @@ function classifyLine(t) {
 }
 function appendLine(text) {
   const s = document.createElement('span');
-  s.className = 'log-line ' + classifyLine(text);
-  s.textContent = text;
+  s.className = 'log-line ' + classifyLine(text); s.textContent = text;
   logLinesEl.appendChild(s);
   localLines++;
-  lineCounter.textContent = localLines + ' line' + (localLines !== 1 ? 's' : '');
+  lineCounter.textContent = localLines + ' lines';
   if (logEmpty && !logEmpty.classList.contains('hidden')) logEmpty.classList.add('hidden');
   if (autoScroll) logBody.scrollTop = logBody.scrollHeight;
 }
@@ -770,10 +727,7 @@ function appendCursor() {
   c.className = 'log-cursor'; c.id = 'logCursor';
   logLinesEl.appendChild(c);
 }
-function removeCursor() {
-  const old = document.getElementById('logCursor');
-  if (old) old.remove();
-}
+function removeCursor() { const o = document.getElementById('logCursor'); if (o) o.remove(); }
 
 // ── SSE ───────────────────────────────────────────────────────────────
 function connectSSE(from) {
@@ -781,25 +735,25 @@ function connectSSE(from) {
   es = new EventSource('/logs?from=' + from);
   es.onmessage = evt => {
     const d = JSON.parse(evt.data);
-    if (d.done) {
-      es.close(); es = null; removeCursor(); updateBadge(d.status); setRunning(false);
-    } else if (d.line !== undefined) { appendLine(d.line); }
+    if (d.done) { es.close(); es = null; removeCursor(); updateBadge(d.status); setRunning(false); }
+    else if (d.line !== undefined) appendLine(d.line);
   };
   es.onerror = () => { es.close(); es = null; };
 }
 
-// ── Status ────────────────────────────────────────────────────────────
+// ── Status ─────────────────────────────────────────────────────────────
 function updateBadge(status) {
   statusBadge.setAttribute('data-status', status);
-  statusText.textContent = status.toUpperCase();
+  const labels = { idle:'Idle', running:'Running…', completed:'Completed', failed:'Failed', stopped:'Stopped' };
+  statusText.textContent = labels[status] || status;
 }
 function setRunning(on) {
-  runBtn.disabled  = on; stopBtn.disabled = !on;
+  runBtn.disabled = on; stopBtn.disabled = !on;
   runBtn.classList.toggle('running', on);
   runBtn.textContent = on ? '⟳ Running…' : '▶ Run';
 }
 
-// ── Polling ───────────────────────────────────────────────────────────
+// ── Polling ────────────────────────────────────────────────────────────
 function startPolling() {
   if (polling) return;
   polling = setInterval(async () => {
@@ -813,13 +767,12 @@ function startPolling() {
   }, 2000);
 }
 
-// ── Run ───────────────────────────────────────────────────────────────
+// ── Run ────────────────────────────────────────────────────────────────
 runBtn.addEventListener('click', async () => {
   const platform = document.querySelector('input[name="platform"]:checked').value;
   const refVal   = document.getElementById('refInput').value.trim();
-
-  const payload = {
-    platform:    platform,
+  const payload  = {
+    platform,
     profile:     document.getElementById('profileSelect').value,
     resume:      resumeCheck.checked,
     serovar:     document.getElementById('serovarSelect').value,
@@ -839,12 +792,12 @@ runBtn.addEventListener('click', async () => {
   if (platform === 'illumina') {
     payload.illumina_reads = document.getElementById('illuminaReadsInput').value.trim();
   } else {
-    const ontMode = document.querySelector('input[name="ontMode"]:checked').value;
-    if (ontMode === 'barcode') {
+    const m = document.querySelector('input[name="ontMode"]:checked').value;
+    if (m === 'barcode') {
       payload.barcode_dir = document.getElementById('barcodeDirInput').value.trim();
       const ss = document.getElementById('sampleSheetInput').value.trim();
       if (ss) payload.sample_sheet = ss;
-    } else if (ontMode === 'sra') {
+    } else if (m === 'sra') {
       payload.sra_list = document.getElementById('sraInput').value.trim();
     } else {
       payload.reads = document.getElementById('readsInput').value.trim();
@@ -853,50 +806,93 @@ runBtn.addEventListener('click', async () => {
 
   try {
     const res = await fetch('/run', { method:'POST',
-      headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+      headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
     const d = await res.json();
-    if (!res.ok) { showToast(d.error || 'Error starting pipeline.', 'error'); return; }
+    if (!res.ok) { showToast(d.error || 'Hata oluştu.', 'error'); return; }
     cmdBar.textContent = d.command || '—';
     setRunning(true); updateBadge('running'); appendCursor(); connectSSE(localLines);
-    showToast('Pipeline started.', 'success');
-  } catch (err) { showToast('Connection error: ' + err.message, 'error'); }
+    showToast('Pipeline başlatıldı.', 'success');
+  } catch (err) { showToast('Bağlantı hatası: ' + err.message, 'error'); }
 });
 
-// ── Stop / Clear ──────────────────────────────────────────────────────
+// ── Stop / Clear ───────────────────────────────────────────────────────
 stopBtn.addEventListener('click', async () => {
-  try {
-    await fetch('/stop', { method:'POST' });
-    removeCursor(); setRunning(false); updateBadge('stopped');
-    showToast('Stop signal sent.', '');
-  } catch (_) {}
+  try { await fetch('/stop', {method:'POST'}); removeCursor(); setRunning(false); updateBadge('stopped'); } catch(_){}
 });
 clearBtn.addEventListener('click', () => {
-  logLinesEl.innerHTML = ''; localLines = 0;
-  lineCounter.textContent = '0 lines';
+  logLinesEl.innerHTML = ''; localLines = 0; lineCounter.textContent = '0 lines';
   if (logEmpty) logEmpty.classList.remove('hidden');
   if (es) appendCursor();
 });
 
-// ── Toast ─────────────────────────────────────────────────────────────
+// ── Toast ──────────────────────────────────────────────────────────────
 let toastTimer = null;
 function showToast(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = 'toast ' + type + ' show';
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// ── Drag-and-Drop ─────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────
+function dzOver(e, zoneId) {
+  e.preventDefault(); e.stopPropagation();
+  document.getElementById(zoneId).classList.add('drag-over');
+}
+function dzLeave(zoneId) {
+  document.getElementById(zoneId).classList.remove('drag-over');
+}
+
+async function dzDrop(e, inputId, zoneId, mode) {
+  e.preventDefault(); e.stopPropagation();
+  const zone = document.getElementById(zoneId);
+  zone.classList.remove('drag-over');
+
+  const items = e.dataTransfer.items;
+  if (!items || items.length === 0) return;
+
+  const entry = items[0].webkitGetAsEntry && items[0].webkitGetAsEntry();
+  if (!entry) { showToast('Klasör okunamadı — lütfen 📁 butonunu kullanın.', 'error'); return; }
+
+  const name = entry.name;
+
+  // Try to resolve full path via Flask
+  try {
+    const res  = await fetch('/resolve?name=' + encodeURIComponent(name));
+    const data = await res.json();
+    if (data.found) {
+      const val = data.path + (mode === 'dir' && inputId === 'readsInput' ? '/*.fastq' : '');
+      document.getElementById(inputId).value = val;
+      dzSync(inputId, zoneId, zoneId + 'Label');
+      showToast('✓ ' + data.path, 'success');
+    } else {
+      // Not found automatically — open the file browser modal
+      showToast('"' + name + '" bulunamadı — lütfen klasörü seçin.', '');
+      openBrowser(inputId, mode, '', mode === 'dir' && inputId === 'readsInput' ? '/*.fastq' : '');
+    }
+  } catch (_) {
+    openBrowser(inputId, mode, '', '');
+  }
+}
+
+// Sync drop zone label with input value
+function dzSync(inputId, zoneId, labelId) {
+  const val  = document.getElementById(inputId).value.trim();
+  const zone = document.getElementById(zoneId);
+  const label= document.getElementById(labelId);
+  if (val) {
+    zone.classList.add('has-value');
+    if (label) label.textContent = val.split('/').pop() || val;
+  } else {
+    zone.classList.remove('has-value');
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────
 // ── File Browser ──────────────────────────────────────────────────────
 // ─────────────────────────────────────────────────────────────────────
-let _bTargetId  = '';   // input element id to fill
-let _bMode      = 'dir'; // 'dir' | 'file'
-let _bExt       = '';   // comma-sep extensions
-let _bSuffix    = '';   // appended to dir selection (e.g. '/*.fastq')
-let _bCurrent   = '';   // current directory
-let _bSelected  = '';   // highlighted entry (full path)
-let _bShowHidden = false;
-let _bFilter    = '';
+let _bTargetId='', _bMode='dir', _bExt='', _bSuffix='', _bCurrent='', _bSelected='', _bShowHidden=false, _bFilter='';
 
 const overlay    = document.getElementById('browserOverlay');
 const bList      = document.getElementById('browserList');
@@ -908,160 +904,84 @@ const bTitle     = document.getElementById('browserTitle');
 const hiddenWrap = document.getElementById('hiddenWrap');
 const hiddenCheck= document.getElementById('hiddenCheck');
 
-// Open modal
 function openBrowser(inputId, mode, ext, suffix) {
-  _bTargetId = inputId;
-  _bMode     = mode;
-  _bExt      = ext;
-  _bSuffix   = suffix;
-  _bSelected = '';
-  _bFilter   = '';
-  bSearch.value = '';
-  bTitle.textContent = mode === 'file' ? '▸ Select File' : '▸ Select Folder';
-
-  // Start navigation at the current value of the input (if valid dir) or home
-  let startPath = document.getElementById(inputId).value.trim();
-  // Strip glob patterns
-  startPath = startPath.replace(/\/\*.*$/, '');
-  if (!startPath) startPath = '~';
-
-  bSelPath.textContent = '—';
-  bSelectBtn.disabled  = (mode === 'file'); // dir can be selected immediately
-
+  _bTargetId=inputId; _bMode=mode; _bExt=ext; _bSuffix=suffix;
+  _bSelected=''; _bFilter=''; bSearch.value='';
+  bTitle.textContent = mode==='file' ? '📄 Dosya Seç' : '📁 Klasör Seç';
+  let start = document.getElementById(inputId).value.trim().replace(/\/\*.*$/,'') || '~';
+  bSelPath.textContent='—'; bSelectBtn.disabled=(mode==='file');
   overlay.classList.add('open');
-  navigateTo(startPath);
+  navigateTo(start);
 }
+function closeBrowser() { overlay.classList.remove('open'); }
 
-function closeBrowser() {
-  overlay.classList.remove('open');
-}
-
-// Navigate to a directory
 async function navigateTo(path) {
-  const url = `/browse?path=${encodeURIComponent(path)}&mode=${_bMode}&ext=${encodeURIComponent(_bExt)}&hidden=${_bShowHidden}`;
+  const url=`/browse?path=${encodeURIComponent(path)}&mode=${_bMode}&ext=${encodeURIComponent(_bExt)}&hidden=${_bShowHidden}`;
   try {
     const data = await (await fetch(url)).json();
     _bCurrent = data.current;
-
-    // If we're in dir mode, preselect the current dir
-    if (_bMode === 'dir') {
-      _bSelected = _bCurrent;
-      bSelPath.textContent = _bCurrent + (_bSuffix || '');
-      bSelectBtn.disabled  = false;
-    }
-
+    if (_bMode==='dir') { _bSelected=_bCurrent; bSelPath.textContent=_bCurrent+(_bSuffix||''); bSelectBtn.disabled=false; }
     renderBreadcrumb(data.current, data.parent);
     renderList(data.dirs, data.files, data.parent);
-  } catch (e) {
-    showToast('Browse error: ' + e.message, 'error');
-  }
+  } catch(e) { showToast('Hata: '+e.message,'error'); }
 }
 
-// Breadcrumb
 function renderBreadcrumb(current, parent) {
-  bBreadcrumb.innerHTML = '';
-  const parts = current === '/' ? [''] : current.split('/');
-  let accumulated = '';
-  parts.forEach((part, i) => {
-    accumulated = i === 0 ? '/' : accumulated + (accumulated === '/' ? '' : '/') + part;
-    if (i > 0) {
-      const sep = document.createElement('span');
-      sep.className = 'crumb-sep'; sep.textContent = '/';
-      bBreadcrumb.appendChild(sep);
-    }
-    const crumb = document.createElement('span');
-    crumb.className = 'crumb';
-    crumb.textContent = part === '' ? '/' : part;
-    const path = accumulated;
-    crumb.addEventListener('click', () => navigateTo(path));
-    bBreadcrumb.appendChild(crumb);
+  bBreadcrumb.innerHTML='';
+  const parts = current==='/' ? [''] : current.split('/');
+  let acc='';
+  parts.forEach((part,i) => {
+    acc = i===0 ? '/' : acc+(acc==='/'?'':'/')+part;
+    if(i>0){const sep=document.createElement('span');sep.className='crumb-sep';sep.textContent='/';bBreadcrumb.appendChild(sep);}
+    const c=document.createElement('span'); c.className='crumb';
+    c.textContent=part===''?'/':part; const p=acc;
+    c.addEventListener('click',()=>navigateTo(p)); bBreadcrumb.appendChild(c);
   });
 }
 
-// List
 function renderList(dirs, files, parent) {
-  const filter = _bFilter.toLowerCase();
-  bList.innerHTML = '';
-
-  // "Go up" entry
-  if (parent) {
-    const up = makeEntry('..', 'dir', true);
-    up.addEventListener('click', () => navigateTo(parent));
-    bList.appendChild(up);
-  }
-
-  const filteredDirs  = dirs.filter(n => !filter || n.toLowerCase().includes(filter));
-  const filteredFiles = files.filter(n => !filter || n.toLowerCase().includes(filter));
-
-  filteredDirs.forEach(name => {
-    const el = makeEntry(name, 'dir', false);
-    el.addEventListener('click', () => navigateTo(_bCurrent + '/' + name));
-    bList.appendChild(el);
+  const f=_bFilter.toLowerCase(); bList.innerHTML='';
+  if(parent){const up=makeEntry('.. (yukarı)','dir',true);up.addEventListener('click',()=>navigateTo(parent));bList.appendChild(up);}
+  dirs.filter(n=>!f||n.toLowerCase().includes(f)).forEach(name=>{
+    const el=makeEntry(name,'dir',false); el.addEventListener('click',()=>navigateTo(_bCurrent+'/'+name)); bList.appendChild(el);
   });
-
-  filteredFiles.forEach(name => {
-    const el = makeEntry(name, 'file', false);
-    el.addEventListener('click', () => selectFile(_bCurrent + '/' + name, el));
-    bList.appendChild(el);
+  files.filter(n=>!f||n.toLowerCase().includes(f)).forEach(name=>{
+    const el=makeEntry(name,'file',false); el.addEventListener('click',()=>selectFile(_bCurrent+'/'+name,el)); bList.appendChild(el);
   });
-
-  if (!parent && filteredDirs.length === 0 && filteredFiles.length === 0) {
-    const empty = document.createElement('div');
-    empty.className = 'browser-empty'; empty.textContent = 'Empty directory';
-    bList.appendChild(empty);
+  if(!parent&&dirs.length===0&&files.length===0){
+    const e=document.createElement('div');e.className='browser-empty';e.textContent='Klasör boş';bList.appendChild(e);
   }
 }
 
-function makeEntry(name, type, isUp) {
-  const el = document.createElement('div');
-  el.className = 'browser-entry ' + type + (isUp ? ' browser-up' : '');
-  const icon = document.createElement('span');
-  icon.className = 'entry-icon';
-  icon.textContent = isUp ? '↑' : (type === 'dir' ? '📁' : '📄');
-  const label = document.createElement('span');
-  label.className = 'entry-name';
-  label.textContent = isUp ? '.. (up)' : name;
-  el.appendChild(icon); el.appendChild(label);
-  return el;
+function makeEntry(name,type,isUp){
+  const el=document.createElement('div'); el.className='browser-entry '+type+(isUp?' browser-up':'');
+  const ic=document.createElement('span'); ic.className='entry-icon';
+  ic.textContent=isUp?'↑':(type==='dir'?'📁':'📄');
+  const lb=document.createElement('span'); lb.className='entry-name'; lb.textContent=name;
+  el.appendChild(ic); el.appendChild(lb); return el;
 }
 
-function selectFile(fullPath, el) {
-  document.querySelectorAll('.browser-entry.file').forEach(e => e.style.background = '');
-  el.style.background = 'rgba(0,230,118,0.08)';
-  _bSelected = fullPath;
-  bSelPath.textContent = fullPath;
-  bSelectBtn.disabled = false;
+function selectFile(fullPath,el){
+  document.querySelectorAll('.browser-entry.file').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected'); _bSelected=fullPath;
+  bSelPath.textContent=fullPath; bSelectBtn.disabled=false;
 }
 
-function confirmSelection() {
-  if (!_bSelected) return;
-  const value = _bSelected + (_bSuffix || '');
-  document.getElementById(_bTargetId).value = value;
+function confirmSelection(){
+  if(!_bSelected) return;
+  document.getElementById(_bTargetId).value=_bSelected+(_bSuffix||'');
+  // sync drop zone if applicable
+  const dzMap={'barcodeDirInput':['barcodeDrop','barcodeDropLabel'],'readsInput':['readsDrop','readsDropLabel']};
+  if(dzMap[_bTargetId]) dzSync(_bTargetId,...dzMap[_bTargetId]);
   closeBrowser();
 }
 
-// Search filter
-bSearch.addEventListener('input', () => {
-  _bFilter = bSearch.value;
-  navigateTo(_bCurrent);
-});
+bSearch.addEventListener('input',()=>{_bFilter=bSearch.value;navigateTo(_bCurrent);});
+hiddenWrap.addEventListener('click',()=>{_bShowHidden=!_bShowHidden;hiddenWrap.classList.toggle('on',_bShowHidden);navigateTo(_bCurrent);});
+overlay.addEventListener('click',e=>{if(e.target===overlay)closeBrowser();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))closeBrowser();});
 
-// Hidden files toggle
-hiddenWrap.addEventListener('click', () => {
-  _bShowHidden = !_bShowHidden;
-  hiddenWrap.classList.toggle('on', _bShowHidden);
-  navigateTo(_bCurrent);
-});
-
-// Close on overlay click (outside modal)
-overlay.addEventListener('click', e => { if (e.target === overlay) closeBrowser(); });
-
-// Keyboard: Esc to close
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && overlay.classList.contains('open')) closeBrowser();
-});
-
-// ── Boot ──────────────────────────────────────────────────────────────
+// ── Boot ───────────────────────────────────────────────────────────────
 startPolling();
 </script>
 </body>

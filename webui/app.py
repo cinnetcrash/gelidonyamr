@@ -185,6 +185,30 @@ def stream_logs():
     )
 
 
+@app.route('/resolve')
+def resolve_path():
+    """Try to find a folder by name in common locations — used by drag-and-drop."""
+    name = request.args.get('name', '').strip()
+    if not name:
+        return jsonify({'found': False})
+
+    roots = [
+        os.path.expanduser('~'),
+        os.path.expanduser('~/Desktop'),
+        os.path.expanduser('~/Downloads'),
+        os.path.expanduser('~/Documents'),
+        '/data', '/mnt', '/media', '/tmp',
+        PIPELINE_DIR,
+        os.getcwd(),
+    ]
+    for root in roots:
+        candidate = os.path.join(root, name)
+        if os.path.isdir(candidate):
+            return jsonify({'found': True, 'path': os.path.abspath(candidate)})
+
+    return jsonify({'found': False, 'name': name})
+
+
 @app.route('/browse')
 def browse():
     req_path = request.args.get('path', os.path.expanduser('~'))
