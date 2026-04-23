@@ -57,6 +57,13 @@ dependencies:
   - spades>=4.0.0
   - snippy>=4.6.0
 
+  # Plasmid annotation
+  - plannotate>=0.6.7
+
+  # Autocycler consensus assembly (ONT)
+  - miniasm>=0.3
+  - raven-assembler>=1.8.3
+
   # Phylogenomics
   - roary>=3.13.0
   - iqtree2>=2.3.0

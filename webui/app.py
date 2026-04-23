@@ -47,22 +47,24 @@ def build_command(data: dict) -> list:
     if data.get('outdir'):
         cmd += ['--outdir', data['outdir']]
 
-    if data.get('platform'):
-        cmd += ['--platform', data['platform']]
+    for key in ('platform', 'serovar', 'genome_size', 'assembler'):
+        if data.get(key):
+            cmd += [f'--{key}', str(data[key])]
 
-    if data.get('serovar'):
-        cmd += ['--serovar', data['serovar']]
-
-    if data.get('genome_size'):
-        cmd += ['--genome_size', data['genome_size']]
+    # Boolean flags
+    if data.get('run_pangenome'):
+        cmd += ['--run_pangenome', 'true']
+    if data.get('run_context_genomes') is False:
+        cmd += ['--run_context_genomes', 'false']
+    if data.get('context_per_country'):
+        cmd += ['--context_per_country', str(data['context_per_country'])]
 
     for key in ('max_cpu', 'max_memory', 'max_time'):
         if data.get(key):
             cmd += [f'--{key}', str(data[key])]
 
-    for key in ('ref_genome', 'kraken2_db', 'clair3_model',
-                'bakta_db', 'plasmidfinder_db', 'snpeff_db',
-                'barcode_dir', 'sample_sheet', 'illumina_reads'):
+    for key in ('ref_genome', 'kraken2_db', 'clair3_model', 'bakta_db',
+                'snpeff_db', 'barcode_dir', 'sample_sheet', 'illumina_reads'):
         if data.get(key):
             cmd += [f'--{key}', data[key]]
 

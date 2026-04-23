@@ -335,7 +335,7 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
       </svg>
       <span class="header-title">GelidonyAMR</span>
     </div>
-    <span class="header-sub">Salmonella · Genomic Epidemiology Pipeline</span>
+    <span class="header-sub">Salmonella · Genomic Epidemiology Pipeline — v2</span>
     <div class="header-right">
       <span class="pipeline-dir" title="{{ pipeline_dir }}">{{ pipeline_dir }}</span>
       <div class="status-badge" id="statusBadge" data-status="idle">
@@ -373,17 +373,17 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
         <label class="radio-option active" id="radioBarcode">
           <input type="radio" name="ontMode" value="barcode" checked>
           <div class="radio-dot"></div>
-          <span class="radio-label">Barcode klasörleri (Guppy / MinKNOW)</span>
+          <span class="radio-label">Barcode folders (Guppy / MinKNOW)</span>
         </label>
         <label class="radio-option" id="radioLocal">
           <input type="radio" name="ontMode" value="local">
           <div class="radio-dot"></div>
-          <span class="radio-label">Tekil FASTQ klasörü</span>
+          <span class="radio-label">Single FASTQ folder</span>
         </label>
         <label class="radio-option" id="radioSRA">
           <input type="radio" name="ontMode" value="sra">
           <div class="radio-dot"></div>
-          <span class="radio-label">SRA accession listesi</span>
+          <span class="radio-label">SRA accession list</span>
         </label>
       </div>
 
@@ -394,11 +394,11 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
           ondragleave="dzLeave('barcodeDrop')"
           ondrop="dzDrop(event,'barcodeDirInput','barcodeDrop','dir')">
           <span class="dz-icon">📁</span>
-          <div class="dz-main" id="barcodeDropLabel">Barcode klasörünü buraya sürükleyin</div>
-          <div class="dz-sub">veya aşağıdan seçin</div>
+          <div class="dz-main" id="barcodeDropLabel">Drop barcode folder here</div>
+          <div class="dz-sub">or browse below</div>
         </div>
         <div class="field">
-          <span class="field-label">fastq_pass/ klasör yolu</span>
+          <span class="field-label">fastq_pass/ directory</span>
           <div class="field-row">
             <input type="text" id="barcodeDirInput" placeholder="/path/to/fastq_pass"
               oninput="dzSync('barcodeDirInput','barcodeDrop','barcodeDropLabel')">
@@ -406,12 +406,12 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
           </div>
         </div>
         <div class="field">
-          <span class="field-label">Sample sheet (opsiyonel — barcode&nbsp;→&nbsp;isim)</span>
+          <span class="field-label">Sample sheet (optional — barcode → sample name)</span>
           <div class="field-row">
-            <input type="text" id="sampleSheetInput" placeholder="barcode01&#9;İzolat_A">
+            <input type="text" id="sampleSheetInput" placeholder="barcode01&#9;Isolate_A">
             <button class="btn-browse" onclick="openBrowser('sampleSheetInput','file','.tsv,.txt','')">📄</button>
           </div>
-          <div class="help-text">Verilmezse barcode isimleri (barcode01 vb.) kullanılır.</div>
+          <div class="help-text">If omitted, barcode folder names are used as sample IDs.</div>
         </div>
       </div>
 
@@ -422,11 +422,11 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
           ondragleave="dzLeave('readsDrop')"
           ondrop="dzDrop(event,'readsInput','readsDrop','dir')">
           <span class="dz-icon">🧬</span>
-          <div class="dz-main" id="readsDropLabel">FASTQ klasörünü buraya sürükleyin</div>
-          <div class="dz-sub">veya aşağıdan seçin</div>
+          <div class="dz-main" id="readsDropLabel">Drop FASTQ folder here</div>
+          <div class="dz-sub">or browse below</div>
         </div>
         <div class="field">
-          <span class="field-label">FASTQ glob deseni</span>
+          <span class="field-label">FASTQ glob pattern</span>
           <div class="field-row">
             <input type="text" id="readsInput" value="input_folder/*.fastq" placeholder="input_folder/*.fastq"
               oninput="dzSync('readsInput','readsDrop','readsDropLabel')">
@@ -438,7 +438,7 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
       <!-- SRA -->
       <div id="sraField" style="display:none;">
         <div class="field">
-          <span class="field-label">Accession listesi (.txt)</span>
+          <span class="field-label">Accession list (.txt)</span>
           <div class="field-row">
             <input type="text" id="sraInput" placeholder="/path/to/accessions.txt">
             <button class="btn-browse" onclick="openBrowser('sraInput','file','.txt','')">📄</button>
@@ -451,12 +451,12 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
     <div class="section" id="illuminaSection" style="display:none;">
       <div class="section-label">Illumina Input</div>
       <div class="field">
-        <span class="field-label">R1 dosya deseni</span>
+        <span class="field-label">R1 file glob (R2 matched automatically)</span>
         <div class="field-row">
           <input type="text" id="illuminaReadsInput" placeholder="data/*_R1.fastq.gz">
           <button class="btn-browse" onclick="openBrowser('illuminaReadsInput','dir','','/*_R1.fastq.gz')">📁</button>
         </div>
-        <div class="help-text">R2 dosyaları otomatik eşleştirilir.</div>
+        <div class="help-text">Example: data/*_R1.fastq.gz → R2 paired automatically.</div>
       </div>
     </div>
 
@@ -484,15 +484,27 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
         </select>
       </div>
       <div class="field">
-        <span class="field-label">Referans genom (boş bırakılırsa otomatik indirilir)</span>
+        <span class="field-label">Reference genome (leave empty to auto-download)</span>
         <div class="field-row">
-          <input type="text" id="refInput" placeholder="Boş bırakın — NCBI'dan indirilir">
+          <input type="text" id="refInput" placeholder="Empty = download from NCBI automatically">
           <button class="btn-browse" onclick="openBrowser('refInput','file','.fna,.fa,.fasta','')">📄</button>
         </div>
       </div>
       <div class="field">
-        <span class="field-label">Genom boyutu tahmini</span>
+        <span class="field-label">Genome size estimate</span>
         <input type="text" id="genomeSizeInput" value="5m" placeholder="5m">
+      </div>
+    </div>
+
+    <!-- Assembly -->
+    <div class="section">
+      <div class="section-label">Assembly</div>
+      <div class="field">
+        <span class="field-label">Assembler (ONT only)</span>
+        <select id="assemblerSelect">
+          <option value="flye">Flye + Racon polishing (default)</option>
+          <option value="autocycler">Autocycler — Flye + Miniasm + Raven consensus</option>
+        </select>
       </div>
     </div>
 
@@ -500,7 +512,7 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
     <div class="section">
       <div class="section-label">Output</div>
       <div class="field">
-        <span class="field-label">Çıktı klasörü</span>
+        <span class="field-label">Output directory</span>
         <div class="field-row">
           <input type="text" id="outdirInput" value="Results" placeholder="Results">
           <button class="btn-browse" onclick="openBrowser('outdirInput','dir','','')">📁</button>
@@ -512,13 +524,34 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
     <div class="section">
       <div class="section-label">Profile</div>
       <div class="field">
-        <span class="field-label">Çalışma ortamı</span>
+        <span class="field-label">Execution environment</span>
         <select id="profileSelect">
           <option value="conda">conda</option>
           <option value="docker">docker</option>
           <option value="singularity">singularity</option>
-          <option value="standard">standard (PATH'te kurulu araçlar)</option>
+          <option value="standard">standard (tools in PATH)</option>
         </select>
+      </div>
+    </div>
+
+    <!-- Optional analyses -->
+    <div class="section">
+      <div class="section-label">Optional Analyses</div>
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="pangenomeCheck">
+          <span>Pan-genome analysis (Roary + IQ-TREE)</span>
+        </label>
+      </div>
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="contextCheck" checked>
+          <span>Download ~100 global context genomes for phylogenomics</span>
+        </label>
+      </div>
+      <div class="field" id="contextOptions">
+        <span class="field-label">Max genomes per country</span>
+        <input type="number" id="contextPerCountry" value="5" min="1" max="20">
       </div>
     </div>
 
@@ -527,16 +560,16 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
       <div class="section-label">Resources</div>
       <div class="resource-row">
         <div class="field">
-          <span class="field-label">Max CPU</span>
+          <span class="field-label">Max CPUs</span>
           <input type="number" id="cpuInput" value="14" min="1" max="128">
         </div>
         <div class="field">
-          <span class="field-label">Max bellek</span>
+          <span class="field-label">Max memory</span>
           <input type="text" id="memInput" value="14GB" placeholder="14GB">
         </div>
       </div>
       <div class="field">
-        <span class="field-label">Max süre</span>
+        <span class="field-label">Max time</span>
         <input type="text" id="timeInput" value="24h" placeholder="24h">
       </div>
     </div>
@@ -545,36 +578,29 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
     <div class="section">
       <div class="section-label">Databases</div>
       <div class="field">
-        <span class="field-label">Kraken2 veritabanı</span>
+        <span class="field-label">Kraken2 database</span>
         <div class="field-row">
           <input type="text" id="kraken2Input" value="/home/analysis/kraken2_db">
           <button class="btn-browse" onclick="openBrowser('kraken2Input','dir','','')">📁</button>
         </div>
       </div>
       <div class="field">
-        <span class="field-label">Clair3 model klasörü</span>
+        <span class="field-label">Clair3 model path</span>
         <div class="field-row">
           <input type="text" id="clair3Input" value="/opt/models/r941_prom_hac_g360+g422">
           <button class="btn-browse" onclick="openBrowser('clair3Input','dir','','')">📁</button>
         </div>
       </div>
       <div class="field">
-        <span class="field-label">Bakta veritabanı</span>
+        <span class="field-label">Bakta database</span>
         <div class="field-row">
           <input type="text" id="baktaInput" value="/home/analysis/bakta_db">
           <button class="btn-browse" onclick="openBrowser('baktaInput','dir','','')">📁</button>
         </div>
       </div>
       <div class="field">
-        <span class="field-label">PlasmidFinder veritabanı</span>
-        <div class="field-row">
-          <input type="text" id="plasmidInput" value="/home/analysis/plasmidfinder_db">
-          <button class="btn-browse" onclick="openBrowser('plasmidInput','dir','','')">📁</button>
-        </div>
-      </div>
-      <div class="field">
-        <span class="field-label">snpEff veritabanı adı</span>
-        <input type="text" id="snpeffInput" placeholder="Salmonella_enterica (otomatik)">
+        <span class="field-label">snpEff database name</span>
+        <input type="text" id="snpeffInput" placeholder="Salmonella_enterica (auto)">
       </div>
     </div>
 
@@ -604,7 +630,7 @@ header { grid-column: 1/-1; display: flex; align-items: center; gap: 14px;
     <div class="log-body" id="logBody">
       <div class="log-empty" id="logEmpty">
         <div class="log-empty-icon">🧬</div>
-        <div class="log-empty-msg">Parametreleri ayarlayın → Run</div>
+        <div class="log-empty-msg">Configure parameters → press Run</div>
       </div>
       <div class="log-lines" id="logLines"></div>
     </div>
@@ -744,7 +770,7 @@ function connectSSE(from) {
 // ── Status ─────────────────────────────────────────────────────────────
 function updateBadge(status) {
   statusBadge.setAttribute('data-status', status);
-  const labels = { idle:'Idle', running:'Running…', completed:'Completed', failed:'Failed', stopped:'Stopped' };
+  const labels = { idle:'Idle', running:'Running…', completed:'Completed', failed:'Failed', stopped:'Stopped' };  // English status labels
   statusText.textContent = labels[status] || status;
 }
 function setRunning(on) {
@@ -773,19 +799,22 @@ runBtn.addEventListener('click', async () => {
   const refVal   = document.getElementById('refInput').value.trim();
   const payload  = {
     platform,
-    profile:     document.getElementById('profileSelect').value,
-    resume:      resumeCheck.checked,
-    serovar:     document.getElementById('serovarSelect').value,
-    genome_size: document.getElementById('genomeSizeInput').value.trim(),
-    outdir:      document.getElementById('outdirInput').value.trim(),
-    max_cpu:     document.getElementById('cpuInput').value,
-    max_memory:  document.getElementById('memInput').value.trim(),
-    max_time:    document.getElementById('timeInput').value.trim(),
-    kraken2_db:       document.getElementById('kraken2Input').value.trim(),
-    clair3_model:     document.getElementById('clair3Input').value.trim(),
-    bakta_db:         document.getElementById('baktaInput').value.trim(),
-    plasmidfinder_db: document.getElementById('plasmidInput').value.trim(),
-    snpeff_db:        document.getElementById('snpeffInput').value.trim(),
+    profile:              document.getElementById('profileSelect').value,
+    resume:               resumeCheck.checked,
+    serovar:              document.getElementById('serovarSelect').value,
+    genome_size:          document.getElementById('genomeSizeInput').value.trim(),
+    assembler:            document.getElementById('assemblerSelect').value,
+    run_pangenome:        document.getElementById('pangenomeCheck').checked,
+    run_context_genomes:  document.getElementById('contextCheck').checked,
+    context_per_country:  document.getElementById('contextPerCountry').value,
+    outdir:               document.getElementById('outdirInput').value.trim(),
+    max_cpu:              document.getElementById('cpuInput').value,
+    max_memory:           document.getElementById('memInput').value.trim(),
+    max_time:             document.getElementById('timeInput').value.trim(),
+    kraken2_db:     document.getElementById('kraken2Input').value.trim(),
+    clair3_model:   document.getElementById('clair3Input').value.trim(),
+    bakta_db:       document.getElementById('baktaInput').value.trim(),
+    snpeff_db:      document.getElementById('snpeffInput').value.trim(),
   };
   if (refVal) payload.ref_genome = refVal;
 
@@ -811,7 +840,7 @@ runBtn.addEventListener('click', async () => {
     if (!res.ok) { showToast(d.error || 'Hata oluştu.', 'error'); return; }
     cmdBar.textContent = d.command || '—';
     setRunning(true); updateBadge('running'); appendCursor(); connectSSE(localLines);
-    showToast('Pipeline başlatıldı.', 'success');
+    showToast('Pipeline started.', 'success');
   } catch (err) { showToast('Bağlantı hatası: ' + err.message, 'error'); }
 });
 
@@ -907,11 +936,10 @@ const hiddenCheck= document.getElementById('hiddenCheck');
 function openBrowser(inputId, mode, ext, suffix) {
   _bTargetId=inputId; _bMode=mode; _bExt=ext; _bSuffix=suffix;
   _bSelected=''; _bFilter=''; bSearch.value='';
-  bTitle.textContent = mode==='file' ? '📄 Dosya Seç' : '📁 Klasör Seç';
+  bTitle.textContent = mode==='file' ? '📄 Select File' : '📁 Select Folder';
   let start = document.getElementById(inputId).value.trim().replace(/\/\*.*$/,'') || '~';
   bSelPath.textContent='—'; bSelectBtn.disabled=(mode==='file');
-  overlay.classList.add('open');
-  navigateTo(start);
+  overlay.classList.add('open'); navigateTo(start);
 }
 function closeBrowser() { overlay.classList.remove('open'); }
 
@@ -949,14 +977,14 @@ function renderList(dirs, files, parent) {
     const el=makeEntry(name,'file',false); el.addEventListener('click',()=>selectFile(_bCurrent+'/'+name,el)); bList.appendChild(el);
   });
   if(!parent&&dirs.length===0&&files.length===0){
-    const e=document.createElement('div');e.className='browser-empty';e.textContent='Klasör boş';bList.appendChild(e);
+    const e=document.createElement('div');e.className='browser-empty';e.textContent='Empty folder';bList.appendChild(e);
   }
 }
 
 function makeEntry(name,type,isUp){
   const el=document.createElement('div'); el.className='browser-entry '+type+(isUp?' browser-up':'');
   const ic=document.createElement('span'); ic.className='entry-icon';
-  ic.textContent=isUp?'↑':(type==='dir'?'📁':'📄');
+  ic.textContent = isUp ? '↑' : (type === 'dir' ? '📁' : '📄');
   const lb=document.createElement('span'); lb.className='entry-name'; lb.textContent=name;
   el.appendChild(ic); el.appendChild(lb); return el;
 }
