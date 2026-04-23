@@ -181,6 +181,48 @@ def stream_logs():
     )
 
 
+@app.route('/browse')
+def browse():
+    req_path = request.args.get('path', os.path.expanduser('~'))
+    mode     = request.args.get('mode', 'dir')   # 'dir' | 'file'
+    ext_arg  = request.args.get('ext', '')        # comma-separated extensions
+    show_hidden = request.args.get('hidden', 'false') == 'true'
+
+    exts = [e.strip() for e in ext_arg.split(',') if e.strip()] if ext_arg else []
+
+    path = os.path.abspath(req_path)
+    if not os.path.isdir(path):
+        path = os.path.dirname(path)
+    if not os.path.exists(path):
+        path = os.path.expanduser('~')
+
+    try:
+        raw = os.listdir(path)
+    except PermissionError:
+        return jsonify({'error': 'Permission denied', 'current': path,
+                        'parent': os.path.dirname(path), 'dirs': [], 'files': []}), 403
+
+    dirs, files = [], []
+    for name in sorted(raw, key=lambda s: s.lower()):
+        if not show_hidden and name.startswith('.'):
+            continue
+        full = os.path.join(path, name)
+        if os.path.isdir(full):
+            dirs.append(name)
+        elif mode == 'file':
+            if not exts or any(name.endswith(e) for e in exts):
+                files.append(name)
+
+    parent = os.path.dirname(path) if path != os.path.sep else None
+
+    return jsonify({
+        'current': path,
+        'parent':  parent,
+        'dirs':    dirs,
+        'files':   files,
+    })
+
+
 if __name__ == '__main__':
     import webbrowser
     print(f'\n  GelidonyAMR Web UI → http://127.0.0.1:5050\n')
