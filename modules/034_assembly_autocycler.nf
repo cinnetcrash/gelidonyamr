@@ -27,7 +27,7 @@ process ASSEMBLY_AUTOCYCLER {
     # ── Assembler 2: Miniasm + Minimap2 ────────────────────────────
     minimap2 -x ava-ont -t ${task.cpus} ${reads_file} ${reads_file} > overlaps.paf
     miniasm -f ${reads_file} overlaps.paf > miniasm.gfa
-    awk '/^S/{print ">"\\$2; print \\$3}' miniasm.gfa > assemblies/miniasm_raw.fasta
+    awk '/^S/{ print ">" \$2; print \$3 }' miniasm.gfa > assemblies/miniasm_raw.fasta
 
     # Polish miniasm with one round of Racon
     minimap2 -x map-ont -t ${task.cpus} assemblies/miniasm_raw.fasta ${reads_file} > mini_map.paf
