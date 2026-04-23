@@ -1,10 +1,11 @@
 process SNPEFF {
-    tag "Variant Annotation: snpEff"
+    tag "Variant Annotation: snpEff — ${sample_id}"
 
     publishDir "${params.outdir}/snpeff/", mode: 'copy'
 
     input:
     tuple val(sample_id), path(vcf_file)
+    val snpeff_db
 
     output:
     tuple val(sample_id),
@@ -19,7 +20,7 @@ process SNPEFF {
     snpEff -v \\
            -stats snpeff_output/${sample_id}_snpEff.html \\
            -csvStats snpeff_output/${sample_id}_snpEff.csv \\
-           ${params.snpeff_db} \\
+           ${snpeff_db} \\
            ${vcf_file} \\
            > snpeff_output/${sample_id}_annotated.vcf
     """

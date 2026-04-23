@@ -47,6 +47,12 @@ def build_command(data: dict) -> list:
     if data.get('outdir'):
         cmd += ['--outdir', data['outdir']]
 
+    if data.get('serovar'):
+        cmd += ['--serovar', data['serovar']]
+
+    if data.get('genome_size'):
+        cmd += ['--genome_size', data['genome_size']]
+
     for key in ('max_cpu', 'max_memory', 'max_time'):
         if data.get(key):
             cmd += [f'--{key}', str(data[key])]

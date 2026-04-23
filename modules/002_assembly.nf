@@ -12,6 +12,6 @@ process ASSEMBLY {
     script:
     """
     mkdir -p assembly_output
-    flye --nano-hq $trimmed_reads_file --out-dir "assembly_output/${sample_id}_assembly" --genome-size 5m --threads 4
+    flye --nano-hq $trimmed_reads_file --out-dir "assembly_output/${sample_id}_assembly" --genome-size ${params.genome_size} --threads ${task.cpus}
     """
 }

@@ -19,7 +19,7 @@ process CGMLST {
     # Always re-download cgMLST schema (overwrite if it exists)
     echo "Downloading cgMLST schema..."
     rm -rf data/cgmlst/
-    chewBBACA.py DownloadSchema -sp 8 -sc 1 -o data/cgmlst/
+    chewBBACA.py DownloadSchema -sp ${params.cgmlst_species_id} -sc ${params.cgmlst_schema_id} -o data/cgmlst/
 
     # Find the .trn file in the schema directory
     trn_file=\$(find data/cgmlst/ -type f -name "*.trn" | head -n 1)
