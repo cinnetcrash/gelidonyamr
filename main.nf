@@ -33,12 +33,12 @@ workflow {
 
     // ── Input: SRA accession list or local FASTQ folder ──────────────────────
     if (params.sra_list) {
-        // Read SRR IDs from TXT file (empty lines are ignored)
+        // Read SRR IDs from TXT file — skip blank lines and # comments
         sra_ids = Channel
             .fromPath(params.sra_list, checkIfExists: true)
             .splitText()
             .map { it.trim() }
-            .filter { it != '' }
+            .filter { it != '' && !it.startsWith('#') }
 
         reads = SRA_DOWNLOAD(sra_ids)
 

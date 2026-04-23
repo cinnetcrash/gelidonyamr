@@ -1,0 +1,8 @@
+name: gelidonyamr-poppunk
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - poppunk>=2.6.0

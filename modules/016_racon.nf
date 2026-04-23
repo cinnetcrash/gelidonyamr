@@ -17,8 +17,9 @@ process RACON {
     cp ${assembly_dir}/assembly.fasta polished_output/${sample_id}_polished/assembly.fasta
 
     # 4 rounds of Racon polishing
+    # -x map-ont (no -a) outputs PAF format, which Racon requires
     for i in 1 2 3 4; do
-        minimap2 -ax map-ont -t ${task.cpus} \\
+        minimap2 -x map-ont -t ${task.cpus} \\
             polished_output/${sample_id}_polished/assembly.fasta \\
             ${reads_file} > mappings_round\${i}.paf
 
@@ -28,7 +29,6 @@ process RACON {
             polished_output/${sample_id}_polished/assembly.fasta \\
             > polished_output/${sample_id}_polished/racon_round\${i}.fasta
 
-        # Update assembly for next round
         cp polished_output/${sample_id}_polished/racon_round\${i}.fasta \\
            polished_output/${sample_id}_polished/assembly.fasta
     done

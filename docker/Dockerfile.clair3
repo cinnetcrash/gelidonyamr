@@ -1,0 +1,13 @@
+FROM mambaorg/micromamba:1.5.8
+
+LABEL maintainer="Gültekin Ünal"
+LABEL description="GelidonyAMR — Clair3 variant calling environment"
+
+USER $MAMBA_USER
+
+COPY --chown=$MAMBA_USER:$MAMBA_USER config/envs/clair3.yaml /tmp/clair3.yaml
+
+RUN micromamba install -y -n base -f /tmp/clair3.yaml \
+    && micromamba clean --all --yes
+
+ENV PATH="/opt/conda/bin:${PATH}"

@@ -1,0 +1,8 @@
+name: gelidonyamr-cgmlst
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - chewbbaca=3.3.6
