@@ -14,14 +14,15 @@ process FETCH_REFERENCE {
     """
     echo "Downloading reference genome for Salmonella ${serovar} (${accession})..."
 
-    datasets download genome accession ${accession} \
-        --include genome \
-        --filename genome.zip
+    # Use NCBI Datasets REST API — no extra tools required beyond curl + unzip
+    curl -L --retry 5 --retry-delay 10 --max-time 300 \
+        "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/${accession}/download?include_annotation_type=GENOME_FASTA&filename=genome.zip" \
+        -o genome.zip
 
     unzip -o genome.zip
 
-    # Merge all contigs/chromosomes into one FASTA
-    cat ncbi_dataset/data/*/*.fna > reference_${serovar}.fna
+    # Merge all sequences into one FASTA
+    find ncbi_dataset/data/ -name "*.fna" | sort | xargs cat > reference_${serovar}.fna
 
     rm -rf genome.zip ncbi_dataset/
 

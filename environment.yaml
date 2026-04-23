@@ -63,5 +63,4 @@ dependencies:
   - parsnp>=2.0.3
   - poppunk>=2.6.0
 
-  # Reference genome download (FETCH_REFERENCE module)
-  - ncbi-datasets-cli>=16.0.0
+  # Reference genome download uses curl + NCBI REST API (no extra package needed)
