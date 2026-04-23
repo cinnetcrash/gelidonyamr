@@ -364,25 +364,67 @@ header::before { content: ''; position: absolute; inset: 0;
   <!-- ── Sidebar ── -->
   <aside class="sidebar">
 
-    <!-- Input -->
+    <!-- Platform + Input -->
     <div class="section">
-      <div class="section-label">Input</div>
+      <div class="section-label">Platform</div>
+
+      <div class="radio-group" id="platformGroup">
+        <label class="radio-option active" id="radioPlatformONT">
+          <input type="radio" name="platform" value="ont" checked>
+          <div class="radio-dot"></div>
+          <span class="radio-label">Oxford Nanopore (ONT)</span>
+        </label>
+        <label class="radio-option" id="radioPlatformILL">
+          <input type="radio" name="platform" value="illumina">
+          <div class="radio-dot"></div>
+          <span class="radio-label">Illumina (paired-end)</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- ONT Input -->
+    <div class="section" id="ontSection">
+      <div class="section-label">ONT Input</div>
 
       <div class="radio-group">
-        <label class="radio-option active" id="radioLocalLabel">
-          <input type="radio" name="inputMode" value="local" checked>
+        <label class="radio-option active" id="radioBarcode">
+          <input type="radio" name="ontMode" value="barcode" checked>
           <div class="radio-dot"></div>
-          <span class="radio-label">Local FASTQ folder</span>
+          <span class="radio-label">Barcode klasörleri (Guppy/MinKNOW)</span>
         </label>
-        <label class="radio-option" id="radioSRALabel">
-          <input type="radio" name="inputMode" value="sra">
+        <label class="radio-option" id="radioLocal">
+          <input type="radio" name="ontMode" value="local">
           <div class="radio-dot"></div>
-          <span class="radio-label">SRA accession list</span>
+          <span class="radio-label">Tekil FASTQ klasörü</span>
+        </label>
+        <label class="radio-option" id="radioSRA">
+          <input type="radio" name="ontMode" value="sra">
+          <div class="radio-dot"></div>
+          <span class="radio-label">SRA accession listesi</span>
         </label>
       </div>
 
-      <div class="field" id="readsField">
-        <span class="field-label">FASTQ folder</span>
+      <!-- Barcode dir -->
+      <div class="field" id="barcodeField">
+        <span class="field-label">Barcode ana klasörü (fastq_pass/)</span>
+        <div class="field-row">
+          <input type="text" id="barcodeDirInput" placeholder="/path/to/fastq_pass">
+          <button class="btn-browse" title="Browse folder"
+            onclick="openBrowser('barcodeDirInput','dir','','')">📁</button>
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <span class="field-label">Sample sheet (isteğe bağlı — barcode → isim)</span>
+          <div class="field-row">
+            <input type="text" id="sampleSheetInput" placeholder="barcode01&#9;Izolat_A">
+            <button class="btn-browse" title="Browse file"
+              onclick="openBrowser('sampleSheetInput','file','.tsv,.txt','')">📄</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local FASTQ -->
+      <div class="field" id="readsField" style="display:none;">
+        <span class="field-label">FASTQ glob pattern</span>
         <div class="field-row">
           <input type="text" id="readsInput" value="input_folder/*.fastq" placeholder="input_folder/*.fastq">
           <button class="btn-browse" title="Browse folder"
@@ -390,13 +432,30 @@ header::before { content: ''; position: absolute; inset: 0;
         </div>
       </div>
 
+      <!-- SRA -->
       <div class="field" id="sraField" style="display:none;">
-        <span class="field-label">Accession list (.txt)</span>
+        <span class="field-label">Accession listesi (.txt)</span>
         <div class="field-row">
           <input type="text" id="sraInput" placeholder="/path/to/accessions.txt">
           <button class="btn-browse" title="Browse file"
             onclick="openBrowser('sraInput','file','.txt','')">📄</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Illumina Input -->
+    <div class="section" id="illuminaSection" style="display:none;">
+      <div class="section-label">Illumina Input</div>
+      <div class="field">
+        <span class="field-label">R1 dosya deseni (R2 otomatik eşleştirilir)</span>
+        <div class="field-row">
+          <input type="text" id="illuminaReadsInput" placeholder="data/*_R1.fastq.gz">
+          <button class="btn-browse" title="Browse folder"
+            onclick="openBrowser('illuminaReadsInput','dir','','/*_R1.fastq.gz')">📁</button>
+        </div>
+        <span style="font-size:10px;color:var(--text-dim);display:block;margin-top:4px;">
+          Örnek: data/*_R1.fastq.gz → R2: data/*_R2.fastq.gz otomatik
+        </span>
       </div>
     </div>
 
@@ -635,16 +694,34 @@ const resumeCheck     = document.getElementById('resumeCheck');
 const autoscrollWrap  = document.getElementById('autoscrollWrap');
 const autoscrollCheck = document.getElementById('autoscrollCheck');
 
-// ── Input mode toggle ─────────────────────────────────────────────────
-document.querySelectorAll('input[name="inputMode"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    const local = radio.value === 'local';
-    document.getElementById('readsField').style.display = local ? '' : 'none';
-    document.getElementById('sraField').style.display   = local ? 'none' : '';
-    document.getElementById('radioLocalLabel').classList.toggle('active', local);
-    document.getElementById('radioSRALabel').classList.toggle('active', !local);
+// ── Platform toggle ────────────────────────────────────────────────────
+function setPlatform(val) {
+  const isONT = val === 'ont';
+  document.getElementById('ontSection').style.display       = isONT ? '' : 'none';
+  document.getElementById('illuminaSection').style.display  = isONT ? 'none' : '';
+  document.getElementById('radioPlatformONT').classList.toggle('active', isONT);
+  document.getElementById('radioPlatformILL').classList.toggle('active', !isONT);
+}
+document.querySelectorAll('input[name="platform"]').forEach(r =>
+  r.addEventListener('change', () => setPlatform(r.value)));
+
+// ── ONT input mode toggle ─────────────────────────────────────────────
+function setOntMode(val) {
+  document.getElementById('barcodeField').style.display = val === 'barcode' ? '' : 'none';
+  document.getElementById('readsField').style.display   = val === 'local'   ? '' : 'none';
+  document.getElementById('sraField').style.display     = val === 'sra'     ? '' : 'none';
+  ['radioBarcode','radioLocal','radioSRA'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
   });
-});
+  const modeMap = { barcode:'radioBarcode', local:'radioLocal', sra:'radioSRA' };
+  const label = document.getElementById(modeMap[val]);
+  if (label) label.classList.add('active');
+}
+document.querySelectorAll('input[name="ontMode"]').forEach(r =>
+  r.addEventListener('change', () => setOntMode(r.value)));
+
+// Click on radio-option labels
 document.querySelectorAll('.radio-option').forEach(opt =>
   opt.addEventListener('click', () => opt.querySelector('input[type="radio"]').click()));
 
@@ -738,9 +815,11 @@ function startPolling() {
 
 // ── Run ───────────────────────────────────────────────────────────────
 runBtn.addEventListener('click', async () => {
-  const isSRA  = document.querySelector('input[name="inputMode"]:checked').value === 'sra';
-  const refVal = document.getElementById('refInput').value.trim();
+  const platform = document.querySelector('input[name="platform"]:checked').value;
+  const refVal   = document.getElementById('refInput').value.trim();
+
   const payload = {
+    platform:    platform,
     profile:     document.getElementById('profileSelect').value,
     resume:      resumeCheck.checked,
     serovar:     document.getElementById('serovarSelect').value,
@@ -756,8 +835,21 @@ runBtn.addEventListener('click', async () => {
     snpeff_db:        document.getElementById('snpeffInput').value.trim(),
   };
   if (refVal) payload.ref_genome = refVal;
-  if (isSRA)  payload.sra_list = document.getElementById('sraInput').value.trim();
-  else        payload.reads    = document.getElementById('readsInput').value.trim();
+
+  if (platform === 'illumina') {
+    payload.illumina_reads = document.getElementById('illuminaReadsInput').value.trim();
+  } else {
+    const ontMode = document.querySelector('input[name="ontMode"]:checked').value;
+    if (ontMode === 'barcode') {
+      payload.barcode_dir = document.getElementById('barcodeDirInput').value.trim();
+      const ss = document.getElementById('sampleSheetInput').value.trim();
+      if (ss) payload.sample_sheet = ss;
+    } else if (ontMode === 'sra') {
+      payload.sra_list = document.getElementById('sraInput').value.trim();
+    } else {
+      payload.reads = document.getElementById('readsInput').value.trim();
+    }
+  }
 
   try {
     const res = await fetch('/run', { method:'POST',

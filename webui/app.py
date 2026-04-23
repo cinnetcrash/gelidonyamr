@@ -47,6 +47,9 @@ def build_command(data: dict) -> list:
     if data.get('outdir'):
         cmd += ['--outdir', data['outdir']]
 
+    if data.get('platform'):
+        cmd += ['--platform', data['platform']]
+
     if data.get('serovar'):
         cmd += ['--serovar', data['serovar']]
 
@@ -58,7 +61,8 @@ def build_command(data: dict) -> list:
             cmd += [f'--{key}', str(data[key])]
 
     for key in ('ref_genome', 'kraken2_db', 'clair3_model',
-                'bakta_db', 'plasmidfinder_db', 'snpeff_db'):
+                'bakta_db', 'plasmidfinder_db', 'snpeff_db',
+                'barcode_dir', 'sample_sheet', 'illumina_reads'):
         if data.get(key):
             cmd += [f'--{key}', data[key]]
 

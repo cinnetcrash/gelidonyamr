@@ -53,6 +53,10 @@ dependencies:
   - mlst=2.23.0
   - chewbbaca=3.3.6
 
+  # Illumina assembly & variant calling
+  - spades>=4.0.0
+  - snippy>=4.6.0
+
   # Phylogenomics
   - roary>=3.13.0
   - iqtree2>=2.3.0
